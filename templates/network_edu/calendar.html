@@ -1,0 +1,429 @@
+{% extends 'base.html' %}
+
+{% block extra_css %}
+<style>
+    .calendar-container {
+        animation: fadeIn 0.8s ease;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .section-header {
+        position: relative;
+        padding-bottom: 1rem;
+        margin-bottom: 2rem;
+        border-bottom: 1px solid #f0f0f0;
+    }
+
+    .section-header:after {
+        content: '';
+        position: absolute;
+        bottom: -1px;
+        left: 0;
+        width: 100px;
+        height: 3px;
+        background: linear-gradient(90deg, #3498db, #2980b9);
+    }
+
+    .task-card {
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        transition: all 0.3s ease;
+        border: none;
+        margin-bottom: 1.5rem;
+    }
+
+    .task-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+    }
+
+    .urgent-tasks {
+        border: none;
+        box-shadow: 0 10px 25px rgba(253, 126, 20, 0.15);
+    }
+
+    .urgent-header {
+        background: linear-gradient(90deg, #fd7e14, #f0932b);
+        color: white;
+        padding: 1rem 1.25rem;
+    }
+
+    .upcoming-tasks {
+        border: none;
+        box-shadow: 0 10px 25px rgba(52, 152, 219, 0.1);
+    }
+
+    .upcoming-header {
+        background: linear-gradient(90deg, #3498db, #2980b9);
+        color: white;
+        padding: 1rem 1.25rem;
+    }
+
+    .task-item {
+        border-radius: 8px;
+        margin-bottom: 1rem;
+        padding: 1.25rem;
+        background-color: #fff;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+        transition: all 0.3s ease;
+        border-left: 4px solid transparent;
+    }
+
+    .task-item:hover {
+        background-color: #f8f9fa;
+    }
+
+    .urgent-task {
+        border-left-color: #fd7e14;
+    }
+
+    .upcoming-task {
+        border-left-color: #3498db;
+    }
+
+    .task-title {
+        font-weight: 600;
+        font-size: 1.1rem;
+        color: #343a40;
+        margin-bottom: 0.5rem;
+    }
+
+    .task-desc {
+        color: #6c757d;
+        font-size: 0.95rem;
+        line-height: 1.5;
+    }
+
+    .task-meta {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-top: 1rem;
+        font-size: 0.85rem;
+        color: #6c757d;
+    }
+
+    .meta-item {
+        display: flex;
+        align-items: center;
+    }
+
+    .meta-item i {
+        margin-right: 5px;
+        font-size: 0.9rem;
+    }
+
+    .deadline-badge {
+        display: inline-flex;
+        align-items: center;
+        background-color: #f8d7da;
+        color: #721c24;
+        padding: 0.35rem 0.75rem;
+        border-radius: 30px;
+        font-size: 0.85rem;
+        font-weight: 500;
+    }
+
+    .deadline-badge i {
+        margin-right: 5px;
+    }
+
+    .deadline-upcoming {
+        background-color: #e2f0fd;
+        color: #0c63e4;
+    }
+
+    .action-btn {
+        margin-right: 0.5rem;
+        padding: 0.35rem 0.75rem;
+        font-size: 0.85rem;
+        border-radius: 6px;
+        transition: all 0.2s ease;
+    }
+
+    .action-btn:hover {
+        transform: translateY(-2px);
+    }
+
+    .action-btn i {
+        margin-right: 5px;
+    }
+
+    .submit-btn {
+        background: linear-gradient(90deg, #2ecc71, #27ae60);
+        border: none;
+        color: white;
+        box-shadow: 0 3px 8px rgba(46, 204, 113, 0.2);
+    }
+
+    .submit-btn:hover {
+        background: linear-gradient(90deg, #27ae60, #219653);
+        box-shadow: 0 5px 12px rgba(46, 204, 113, 0.3);
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 3rem;
+        background-color: #f8f9fa;
+        border-radius: 12px;
+        margin-top: 2rem;
+        animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+        0% { box-shadow: 0 0 0 0 rgba(0, 123, 255, 0.1); }
+        70% { box-shadow: 0 0 0 15px rgba(0, 123, 255, 0); }
+        100% { box-shadow: 0 0 0 0 rgba(0, 123, 255, 0); }
+    }
+
+    .empty-state i {
+        font-size: 4rem;
+        color: #6c757d;
+        margin-bottom: 1.5rem;
+        opacity: 0.6;
+    }
+
+    .progress-section {
+        margin-bottom: 2rem;
+    }
+
+    .progress-container {
+        height: 8px;
+        background-color: #f0f0f0;
+        border-radius: 4px;
+        overflow: hidden;
+        margin-bottom: 0.5rem;
+    }
+
+    .progress-bar {
+        height: 100%;
+        background: linear-gradient(90deg, #3498db, #2980b9);
+        border-radius: 4px;
+        transition: width 1s ease;
+    }
+
+    .progress-label {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.85rem;
+        color: #6c757d;
+    }
+
+    .section-toggle {
+        cursor: pointer;
+        user-select: none;
+    }
+
+    .section-toggle i {
+        transition: transform 0.3s ease;
+    }
+
+    .section-toggle.collapsed i {
+        transform: rotate(-90deg);
+    }
+
+    .task-count {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 24px;
+        height: 24px;
+        background-color: rgba(255, 255, 255, 0.3);
+        border-radius: 50%;
+        font-size: 0.85rem;
+        margin-left: 0.75rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="calendar-container">
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="section-header d-flex align-items-center justify-content-between">
+                <h1 class="mb-0">Календарь заданий</h1>
+                <div class="d-flex align-items-center">
+                    <button class="btn btn-sm btn-outline-primary me-2">
+                        <i class="bi bi-filter"></i> Фильтр
+                    </button>
+                    <button class="btn btn-sm btn-outline-primary">
+                        <i class="bi bi-calendar-week"></i> Календарный вид
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if deadline_soon or upcoming_assignments %}
+    <div class="progress-section">
+        <div class="progress-container">
+            <div class="progress-bar" style="width: 65%"></div>
+        </div>
+        <div class="progress-label">
+            <div>Выполнено: 65%</div>
+            <div>{{ deadline_soon|length|add:upcoming_assignments|length }} заданий в работе</div>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if deadline_soon %}
+    <div class="card task-card urgent-tasks mb-4">
+        <div class="card-header urgent-header d-flex justify-content-between align-items-center section-toggle" data-bs-toggle="collapse" data-bs-target="#urgentTasks" aria-expanded="true">
+            <h5 class="mb-0">
+                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                Скоро истекает срок сдачи
+                <span class="task-count">{{ deadline_soon|length }}</span>
+            </h5>
+            <i class="bi bi-chevron-down"></i>
+        </div>
+        <div id="urgentTasks" class="collapse show">
+            <div class="card-body">
+                {% for assignment in deadline_soon %}
+                <div class="task-item urgent-task" data-assignment-id="{{ assignment.id }}" style="animation: fadeIn {{ forloop.counter|add:2 }}00ms ease">
+                    <div class="d-flex w-100 justify-content-between align-items-start">
+                        <h5 class="task-title">{{ assignment.title }}</h5>
+                        <div class="deadline-badge">
+                            <i class="bi bi-alarm"></i> Осталось: {{ assignment.due_date|timeuntil }}
+                        </div>
+                    </div>
+                    <p class="task-desc">{{ assignment.description|striptags|truncatechars:100 }}</p>
+                    <div class="task-meta">
+                        <div class="meta-item">
+                            <i class="bi bi-book"></i> {{ assignment.lesson.module.course.title }}
+                        </div>
+                        <div class="meta-item">
+                            <i class="bi bi-journal-text"></i> {{ assignment.lesson.title }}
+                        </div>
+                        <div class="meta-item">
+                            <i class="bi bi-calendar-event"></i> {{ assignment.due_date|date:"d.m.Y H:i" }}
+                        </div>
+                    </div>
+                    <div class="mt-3">
+                        <a href="{% url 'lesson_detail' assignment.lesson.id %}" class="btn action-btn btn-outline-primary">
+                            <i class="bi bi-eye"></i> Просмотр урока
+                        </a>
+                        <a href="{% url 'submission_create' assignment.id %}" class="btn action-btn submit-btn">
+                            <i class="bi bi-send"></i> Отправить решение
+                        </a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if upcoming_assignments %}
+    <div class="card task-card upcoming-tasks">
+        <div class="card-header upcoming-header d-flex justify-content-between align-items-center section-toggle" data-bs-toggle="collapse" data-bs-target="#upcomingTasks" aria-expanded="true">
+            <h5 class="mb-0">
+                <i class="bi bi-calendar-check me-2"></i>
+                Предстоящие задания
+                <span class="task-count">{{ upcoming_assignments|length }}</span>
+            </h5>
+            <i class="bi bi-chevron-down"></i>
+        </div>
+        <div id="upcomingTasks" class="collapse show">
+            <div class="card-body">
+                {% for assignment in upcoming_assignments %}
+                <div class="task-item upcoming-task" data-assignment-id="{{ assignment.id }}" style="animation: fadeIn {{ forloop.counter|add:2 }}00ms ease">
+                    <div class="d-flex w-100 justify-content-between align-items-start">
+                        <h5 class="task-title">{{ assignment.title }}</h5>
+                        <div class="deadline-badge deadline-upcoming">
+                            <i class="bi bi-calendar"></i> {{ assignment.due_date|date:"d.m.Y H:i" }}
+                        </div>
+                    </div>
+                    <p class="task-desc">{{ assignment.description|striptags|truncatechars:100 }}</p>
+                    <div class="task-meta">
+                        <div class="meta-item">
+                            <i class="bi bi-book"></i> {{ assignment.lesson.module.course.title }}
+                        </div>
+                        <div class="meta-item">
+                            <i class="bi bi-journal-text"></i> {{ assignment.lesson.title }}
+                        </div>
+                    </div>
+                    <div class="mt-3">
+                        <a href="{% url 'lesson_detail' assignment.lesson.id %}" class="btn action-btn btn-outline-primary">
+                            <i class="bi bi-eye"></i> Просмотр урока
+                        </a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if not deadline_soon and not upcoming_assignments %}
+    <div class="empty-state">
+        <i class="bi bi-calendar-check"></i>
+        <h3>У вас нет заданий с установленными сроками сдачи</h3>
+        <p class="text-muted">Все задания выполнены или еще не назначены.</p>
+        <a href="{% url 'courses' %}" class="btn btn-primary mt-3">
+            <i class="bi bi-book me-2"></i>Перейти к курсам
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Анимация при прокрутке
+        function animateOnScroll() {
+            const elements = document.querySelectorAll('.task-item');
+            elements.forEach(element => {
+                const position = element.getBoundingClientRect();
+
+                // Проверяем, виден ли элемент
+                if(position.top < window.innerHeight && position.bottom >= 0) {
+                    element.style.opacity = '1';
+                    element.style.transform = 'translateY(0)';
+                }
+            });
+        }
+
+        // Начальное состояние элементов
+        const elements = document.querySelectorAll('.task-item');
+        elements.forEach(element => {
+            element.style.opacity = '0';
+            element.style.transform = 'translateY(20px)';
+            element.style.transition = 'all 0.5s ease';
+        });
+
+        // Запускаем анимацию при загрузке и при прокрутке
+        window.addEventListener('scroll', animateOnScroll);
+        animateOnScroll();
+
+        // Обработчики для сворачивания/разворачивания разделов
+        const toggles = document.querySelectorAll('.section-toggle');
+        toggles.forEach(toggle => {
+            toggle.addEventListener('click', function() {
+                const icon = this.querySelector('i.bi-chevron-down');
+                if (icon) {
+                    if (this.getAttribute('aria-expanded') === 'true') {
+                        icon.style.transform = 'rotate(0deg)';
+                    } else {
+                        icon.style.transform = 'rotate(-180deg)';
+                    }
+                }
+            });
+        });
+
+        // Анимация прогресс-бара
+        const progressBar = document.querySelector('.progress-bar');
+        if (progressBar) {
+            setTimeout(() => {
+                progressBar.style.width = '65%';
+            }, 300);
+        }
+    });
+</script>
+{% endblock %}

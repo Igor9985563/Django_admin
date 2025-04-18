@@ -1,0 +1,542 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row mb-4 align-items-center animate-in">
+        <div class="col-md-6">
+            <h1 class="display-5 fw-bold text-primary text-reveal">Доступные курсы</h1>
+        </div>
+        <div class="col-md-6">
+            <form id="searchForm" method="GET" action="{% url 'course_list' %}" class="d-flex flex-wrap gap-2 search-form-animate">
+                <!-- Категории с автоматическим обновлением -->
+                <select class="form-select auto-submit animate-in" name="category" id="categorySelect" style="max-width: 180px;">
+                    <option value="">Все категории</option>
+                    {% for category in categories %}
+                        <option value="{{ category.id }}" {% if selected_category == category.id|stringformat:"s" %}selected{% endif %}>
+                            {{ category.name }}
+                        </option>
+                    {% endfor %}
+                </select>
+
+                <!-- Поле поиска -->
+                <input class="form-control animate-in" type="search" placeholder="Поиск курсов" name="q" value="{{ request.GET.q }}">
+
+                <!-- Кнопка поиска -->
+                <button class="btn btn-primary btn-glow animate-in" type="submit">
+                    <i class="bi bi-search me-1"></i> Поиск
+                </button>
+            </form>
+        </div>
+    </div>
+
+    {% if user.profile.is_instructor %}
+    <div class="mb-4 animate-in" style="--animate-delay: 0.2s;">
+        <a href="{% url 'course_create' %}" class="btn btn-success rounded-pill btn-float">
+            <i class="bi bi-plus-circle me-1"></i> Создать новый курс
+        </a>
+    </div>
+    {% endif %}
+
+    <div class="row g-4" id="coursesList">
+        {% if courses %}
+            {% for course in courses %}
+                <div class="col-lg-4 col-md-6 course-item" style="--item-delay: {{ forloop.counter0|divisibleby:3 }}00ms">
+                    <div class="card course-card h-100 animate-card">
+                        <div class="card-img-wrapper overflow-hidden">
+                            {% if course.image %}
+                                <img src="{{ course.image.url }}" class="card-img-top object-fit-cover zoom-on-hover" alt="{{ course.title }}">
+                            {% else %}
+                                <div class="bg-light text-center py-5 course-placeholder">
+                                    <i class="bi bi-book display-1 text-secondary book-icon"></i>
+                                </div>
+                            {% endif %}
+                            <div class="category-badge">
+                                <span class="badge bg-primary pulse">{{ course.category.name }}</span>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <h5 class="card-title fw-bold text-truncate">{{ course.title }}</h5>
+                            <p class="card-text text-muted">{{ course.description|truncatechars:100 }}</p>
+                            <div class="d-flex align-items-center mb-3">
+                                <i class="bi bi-person-circle me-2 text-primary"></i>
+                                <span>{{ course.instructor.username }}</span>
+                            </div>
+                        </div>
+                        <div class="card-footer bg-white border-top-0 d-flex justify-content-between align-items-center">
+                            <small class="text-muted">
+                                <i class="bi bi-calendar3 me-1"></i> {{ course.created_at|date:"d.m.Y" }}
+                            </small>
+                            <a href="{% url 'course_detail' course.id %}" class="btn btn-outline-primary rounded-pill btn-shine">
+                                Подробнее <i class="bi bi-arrow-right ms-1 arrow-animate"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="col-12 animate-in" style="--animate-delay: 0.3s;">
+                <div class="alert alert-info shadow-sm">
+                    <i class="bi bi-info-circle me-2"></i> Курсы не найдены. Попробуйте изменить параметры поиска.
+                </div>
+            </div>
+        {% endif %}
+    </div>
+
+    {% if page_obj.paginator.num_pages > 1 %}
+    <div class="d-flex justify-content-center mt-5 animate-in" style="--animate-delay: 0.4s;">
+        <nav aria-label="Навигация по страницам">
+            <ul class="pagination pagination-animated">
+                {% if page_obj.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page=1{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}" aria-label="Первая">
+                            <span aria-hidden="true">&laquo;&laquo;</span>
+                        </a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}" aria-label="Предыдущая">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                {% endif %}
+
+                {% for i in page_obj.paginator.page_range %}
+                    {% if page_obj.number == i %}
+                        <li class="page-item active"><span class="page-link">{{ i }}</span></li>
+                    {% elif i > page_obj.number|add:'-3' and i < page_obj.number|add:'3' %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ i }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}">{{ i }}</a>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+
+                {% if page_obj.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}" aria-label="Следующая">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}" aria-label="Последняя">
+                            <span aria-hidden="true">&raquo;&raquo;</span>
+                        </a>
+                    </li>
+                {% endif %}
+            </ul>
+        </nav>
+    </div>
+    {% endif %}
+</div>
+
+<style>
+:root {
+    --primary-color: #0d6efd;
+    --primary-hover: #0b5ed7;
+    --transition-time: 0.3s;
+    --transition-time-long: 0.5s;
+}
+
+/* Основные стили с улучшениями */
+.hover-shadow:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.15) !important;
+}
+
+.transition-all {
+    transition: all var(--transition-time) ease;
+}
+
+.card {
+    border-radius: 15px;
+    overflow: hidden;
+    border: none;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.07);
+}
+
+.card-img-top {
+    height: 200px;
+    object-fit: cover;
+    border-top-left-radius: 15px;
+    border-top-right-radius: 15px;
+}
+
+.course-placeholder {
+    height: 200px;
+}
+
+.card-img-wrapper {
+    position: relative;
+}
+
+.category-badge {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+}
+
+.badge {
+    padding: 0.5em 0.75em;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    border-radius: 8px;
+}
+
+.btn-outline-primary {
+    border-radius: 25px;
+    font-weight: 500;
+    padding: 0.5rem 1.25rem;
+}
+
+.btn-outline-primary:hover {
+    box-shadow: 0 0 15px rgba(13, 110, 253, 0.3);
+    transform: translateY(-2px);
+}
+
+.pagination .page-link {
+    border-radius: 8px;
+    margin: 0 3px;
+    font-weight: 500;
+}
+
+.pagination .page-item.active .page-link {
+    box-shadow: 0 2px 8px rgba(13, 110, 253, 0.4);
+}
+
+/* Эффект загрузки при изменении категории */
+.loading {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+/* Новые анимации и улучшения */
+
+/* Анимация появления элементов при загрузке */
+.animate-in {
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fadeInUp 0.6s ease forwards;
+    animation-delay: var(--animate-delay, 0s);
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Анимированные карточки курсов */
+.animate-card {
+    transform: translateY(30px);
+    opacity: 0;
+    animation: cardAppear 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+    animation-delay: calc(0.1s + var(--item-delay, 0s));
+    box-shadow: 0 5px 15px rgba(0,0,0,0.07);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.animate-card:hover {
+    transform: translateY(-8px) scale(1.01);
+    box-shadow: 0 15px 30px rgba(0,0,0,0.12);
+}
+
+@keyframes cardAppear {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Увеличение изображения при наведении */
+.zoom-on-hover {
+    transition: transform 1.2s ease;
+}
+
+.card-img-wrapper:hover .zoom-on-hover {
+    transform: scale(1.08);
+}
+
+/* Анимация иконки книги */
+.book-icon {
+    animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+    100% { transform: translateY(0px); }
+}
+
+/* Анимация кнопки "Подробнее" */
+.btn-shine {
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.btn-shine::before {
+    content: '';
+    position: absolute;
+    top: -100%;
+    left: -100%;
+    width: 50%;
+    height: 300%;
+    background: rgba(255,255,255,0.2);
+    transform: rotate(45deg);
+    transition: all 0.5s ease;
+}
+
+.btn-shine:hover::before {
+    animation: shine 1.2s;
+}
+
+@keyframes shine {
+    0% {
+        left: -100%;
+    }
+    100% {
+        left: 200%;
+    }
+}
+
+/* Анимация стрелки в кнопке */
+.arrow-animate {
+    display: inline-block;
+    transition: transform 0.3s ease;
+}
+
+.btn:hover .arrow-animate {
+    transform: translateX(5px);
+}
+
+/* Анимация заголовка */
+.text-reveal {
+    display: inline-block;
+    position: relative;
+    color: var(--primary-color);
+    overflow: hidden;
+}
+
+.text-reveal::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, #fff);
+    animation: revealText 1.2s cubic-bezier(0.77, 0, 0.175, 1) forwards;
+}
+
+@keyframes revealText {
+    0% {
+        width: 100%;
+    }
+    100% {
+        width: 0;
+    }
+}
+
+/* Пульсация значка категории */
+.pulse {
+    animation: pulse 2s infinite;
+    box-shadow: 0 0 0 rgba(13, 110, 253, 0.4);
+}
+
+@keyframes pulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(13, 110, 253, 0.4);
+    }
+    70% {
+        box-shadow: 0 0 0 10px rgba(13, 110, 253, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(13, 110, 253, 0);
+    }
+}
+
+/* Анимация кнопки поиска */
+.btn-glow {
+    position: relative;
+    z-index: 1;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.btn-glow::after {
+    content: "";
+    background: rgba(255, 255, 255, 0.2);
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    opacity: 0;
+    border-radius: 50%;
+    z-index: -1;
+    transition: all 0.6s ease;
+}
+
+.btn-glow:hover::after {
+    width: 200%;
+    height: 200%;
+    opacity: 1;
+    top: -50%;
+    left: -50%;
+}
+
+/* Анимация кнопки "Создать новый курс" */
+.btn-float {
+    transform: perspective(1px) translateZ(0);
+    transition-property: transform;
+    transition-duration: 0.3s;
+}
+
+.btn-float:hover,
+.btn-float:focus,
+.btn-float:active {
+    transform: scale(1.05);
+    box-shadow: 0 10px 20px rgba(0, 123, 85, 0.2);
+}
+
+/* Анимация пагинации */
+.pagination-animated .page-link {
+    transition: all 0.3s ease;
+}
+
+.pagination-animated .page-link:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 10px rgba(0,0,0,0.1);
+}
+
+/* Прелоадер для загрузки контента */
+.loading::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255,255,255,0.8);
+    z-index: 1;
+}
+
+.loading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 40px;
+    height: 40px;
+    margin-top: -20px;
+    margin-left: -20px;
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid var(--primary-color);
+    border-radius: 50%;
+    z-index: 2;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Стили для анимированной формы поиска */
+.search-form-animate input,
+.search-form-animate select,
+.search-form-animate button {
+    transition: all 0.3s ease;
+}
+
+.search-form-animate input:focus,
+.search-form-animate select:focus {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+}
+
+/* Анимация при скролле */
+@media (prefers-reduced-motion: no-preference) {
+    .course-item {
+        opacity: 0;
+        transform: translateY(30px);
+        transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+
+    .course-item.visible {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Автоматическая отправка формы при изменении категории
+    const categorySelect = document.getElementById('categorySelect');
+
+    if (categorySelect) {
+        categorySelect.addEventListener('change', function() {
+            // Добавляем эффект загрузки к списку курсов
+            const coursesList = document.getElementById('coursesList');
+            if (coursesList) coursesList.classList.add('loading');
+
+            // Отправляем форму
+            document.getElementById('searchForm').submit();
+        });
+    }
+
+    // Добавление анимации появления при прокрутке
+    const observerOptions = {
+        root: null,
+        rootMargin: '0px',
+        threshold: 0.2
+    };
+
+    const observer = new IntersectionObserver((entries, observer) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+                observer.unobserve(entry.target);
+            }
+        });
+    }, observerOptions);
+
+    const courseItems = document.querySelectorAll('.course-item');
+    courseItems.forEach(item => {
+        observer.observe(item);
+    });
+
+    // Добавляем эффекты при наведении на кнопки
+    const btnShine = document.querySelectorAll('.btn-shine');
+    btnShine.forEach(btn => {
+        btn.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-3px)';
+        });
+
+        btn.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
+        });
+    });
+
+    // Анимация для карточек
+    const cards = document.querySelectorAll('.animate-card');
+    cards.forEach((card, index) => {
+        card.style.animationDelay = `${0.1 + (index % 3) * 0.1}s`;
+    });
+
+    // Анимированное появление элементов страницы
+    const animateItems = document.querySelectorAll('.animate-in');
+    animateItems.forEach((item, index) => {
+        item.style.setProperty('--animate-delay', `${0.1 * index}s`);
+    });
+});
+</script>
+{% endblock %}

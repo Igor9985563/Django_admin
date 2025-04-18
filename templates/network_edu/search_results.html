@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h1>Результаты поиска</h1>
+        
+        <form method="get" action="{% url 'search' %}" class="mt-3">
+            <div class="input-group mb-3">
+                <input type="text" name="query" class="form-control" placeholder="Поиск по курсам, урокам и ресурсам..." value="{{ query }}">
+                <button class="btn btn-primary" type="submit">Поиск</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% if query %}
+    <div class="row">
+        <div class="col-12">
+            <h2>Результаты для "{{ query }}"</h2>
+            
+            {% if not results.courses and not results.lessons and not results.resources %}
+                <div class="alert alert-info">
+                    По вашему запросу ничего не найдено. Попробуйте изменить поисковый запрос.
+                </div>
+            {% endif %}
+            
+            {% if results.courses %}
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h3 class="mb-0">Курсы ({{ results.courses|length }})</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="list-group">
+                            {% for course in results.courses %}
+                                <a href="{% url 'course_detail' course.id %}" class="list-group-item list-group-item-action">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h5 class="mb-1">{{ course.title }}</h5>
+                                        <small>{{ course.created_at|date:"d.m.Y" }}</small>
+                                    </div>
+                                    <p class="mb-1">{{ course.description|truncatechars:150 }}</p>
+                                    <small>Инструктор: {{ course.instructor.username }}</small>
+                                </a>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+            
+            {% if results.lessons %}
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h3 class="mb-0">Уроки ({{ results.lessons|length }})</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="list-group">
+                            {% for lesson in results.lessons %}
+                                <a href="{% url 'lesson_detail' lesson.id %}" class="list-group-item list-group-item-action">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h5 class="mb-1">{{ lesson.title }}</h5>
+                                        <small>{{ lesson.created_at|date:"d.m.Y" }}</small>
+                                    </div>
+                                    <p class="mb-1">Курс: {{ lesson.module.course.title }}</p>
+                                    <small>Модуль: {{ lesson.module.title }}</small>
+                                </a>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+            
+            {% if results.resources %}
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h3 class="mb-0">Ресурсы ({{ results.resources|length }})</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="list-group">
+                            {% for resource in results.resources %}
+                                <a href="{{ resource.file.url }}" class="list-group-item list-group-item-action" target="_blank">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h5 class="mb-1">{{ resource.title }}</h5>
+                                        <small>{{ resource.uploaded_at|date:"d.m.Y" }}</small>
+                                    </div>
+                                    <p class="mb-1">{{ resource.description }}</p>
+                                    <small>Загрузил: {{ resource.uploaded_by.username }}</small>
+                                </a>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+{% endif %}
+{% endblock %}
+

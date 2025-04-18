@@ -1,0 +1,640 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+    /* Основные анимации */
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes scaleIn {
+        from { transform: scale(0.95); opacity: 0; }
+        to { transform: scale(1); opacity: 1; }
+    }
+
+    @keyframes slideIn {
+        from { transform: translateX(-20px); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
+    }
+
+    @keyframes highlight {
+        0% { background-color: rgba(255, 248, 212, 0); }
+        50% { background-color: rgba(255, 248, 212, 1); }
+        100% { background-color: rgba(255, 248, 212, 0); }
+    }
+
+    /* Общие стили страницы */
+    .course-container {
+        animation: fadeIn 0.8s ease-out;
+    }
+
+    .course-header {
+        padding: 2rem 0;
+        border-radius: 12px;
+        position: relative;
+        overflow: hidden;
+        margin-bottom: 2rem;
+        background: linear-gradient(135deg, #f5f7fa 0%, #e4e8eb 100%);
+    }
+
+    .course-title {
+        font-weight: 800;
+        font-size: 2.5rem;
+        margin-bottom: 0.5rem;
+        color: #2d3748;
+        position: relative;
+        display: inline-block;
+    }
+
+    .course-title:after {
+        content: '';
+        position: absolute;
+        width: 40%;
+        height: 4px;
+        bottom: -8px;
+        left: 0;
+        background: linear-gradient(90deg, #4776e6, #8e54e9);
+        border-radius: 2px;
+        transition: width 0.4s ease;
+    }
+
+    .course-title:hover:after {
+        width: 100%;
+    }
+
+    .course-description {
+        font-size: 1.2rem;
+        line-height: 1.6;
+        color: #4a5568;
+        max-width: 90%;
+    }
+
+    .course-meta {
+        background-color: white;
+        border-radius: 10px;
+        padding: 1.5rem;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        margin-bottom: 2rem;
+        animation: scaleIn 0.6s ease-out;
+        transition: all 0.3s ease;
+    }
+
+    .course-meta:hover {
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+        transform: translateY(-5px);
+    }
+
+    .meta-item {
+        display: flex;
+        align-items: center;
+        margin-bottom: 0.7rem;
+        font-size: 1.05rem;
+    }
+
+    .meta-item i {
+        color: #5a67d8;
+        font-size: 1.2rem;
+        margin-right: 10px;
+        width: 24px;
+        text-align: center;
+    }
+
+    .meta-label {
+        font-weight: 600;
+        color: #2d3748;
+        margin-right: 8px;
+    }
+
+    .meta-value {
+        color: #4a5568;
+    }
+
+    /* Действия с курсом */
+    .course-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin: 1.5rem 0;
+    }
+
+    .btn {
+        border-radius: 50px;
+        padding: 10px 20px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+    }
+
+    .btn:active {
+        transform: translateY(0);
+    }
+
+    .btn::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 10px;
+        height: 10px;
+        background: rgba(255, 255, 255, 0.3);
+        border-radius: 50%;
+        opacity: 0;
+        transform: scale(1) translate(-50%, -50%);
+        transition: all 0.6s;
+    }
+
+    .btn:active::after {
+        transform: scale(20) translate(-50%, -50%);
+        opacity: 1;
+        transition: all 0s;
+    }
+
+    .btn-success {
+        background: linear-gradient(45deg, #28a745, #20c997);
+        border: none;
+    }
+
+    .btn-danger {
+        background: linear-gradient(45deg, #dc3545, #fd7e14);
+        border: none;
+    }
+
+    .btn-warning {
+        background: linear-gradient(45deg, #ffc107, #fd7e14);
+        border: none;
+        color: #212529;
+    }
+
+    .btn i {
+        margin-right: 8px;
+        font-size: 1.1em;
+    }
+
+    /* Секция модулей */
+    .modules-section {
+        margin-top: 3rem;
+        animation: fadeIn 1s ease-out 0.3s both;
+    }
+
+    .section-title {
+        font-weight: 700;
+        color: #2d3748;
+        margin-bottom: 1.5rem;
+        position: relative;
+        display: inline-block;
+    }
+
+    .section-title:after {
+        content: '';
+        position: absolute;
+        width: 60%;
+        height: 3px;
+        bottom: -8px;
+        left: 0;
+        background: linear-gradient(90deg, #5a67d8, #8e54e9);
+        border-radius: 2px;
+    }
+
+    /* Аккордеон модулей */
+    .module-accordion {
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+    }
+
+    .accordion-item {
+        border: none;
+        margin-bottom: 10px;
+        background-color: white;
+        border-radius: 8px !important;
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        transition: all 0.3s ease;
+    }
+
+    .accordion-item:hover {
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+    }
+
+    .accordion-button {
+        padding: 1.2rem 1.5rem;
+        font-weight: 600;
+        font-size: 1.1rem;
+        color: #2d3748;
+        background-color: white;
+        transition: all 0.3s ease;
+    }
+
+    .accordion-button:not(.collapsed) {
+        background: linear-gradient(to right, rgba(90, 103, 216, 0.1), transparent);
+        color: #5a67d8;
+    }
+
+    .accordion-button:focus {
+        box-shadow: none;
+        border-color: #5a67d8;
+    }
+
+    .accordion-button::after {
+        background-size: 1.2rem;
+        transition: all 0.3s ease;
+    }
+
+    .accordion-body {
+        padding: 1.5rem;
+        background-color: #f8fafc;
+    }
+
+    /* Список уроков */
+    .lessons-list {
+        margin-top: 1rem;
+    }
+
+    .lesson-item {
+        background-color: white;
+        border: 1px solid rgba(0, 0, 0, 0.08) !important;
+        margin-bottom: 0.5rem;
+        border-radius: 8px !important;
+        padding: 0.8rem 1rem;
+        transition: all 0.3s ease;
+    }
+
+    .lesson-item:hover {
+        transform: translateX(5px);
+        border-left: 3px solid #5a67d8 !important;
+        background-color: #f8fafc;
+    }
+
+    .lesson-link {
+        color: #4a5568;
+        font-weight: 500;
+        display: block;
+        transition: all 0.2s ease;
+    }
+
+    .lesson-link:hover {
+        color: #5a67d8;
+    }
+
+    .assignment-badge {
+        background: linear-gradient(45deg, #5a67d8, #8e54e9);
+        font-weight: 500;
+        font-size: 0.8rem;
+        padding: 0.4rem 0.8rem;
+    }
+
+    /* Действия с модулем */
+    .module-actions {
+        margin-top: 1rem;
+        display: flex;
+        justify-content: flex-end;
+    }
+
+    .btn-outline-primary {
+        color: #5a67d8;
+        border-color: #5a67d8;
+    }
+
+    .btn-outline-primary:hover {
+        background-color: #5a67d8;
+        color: white;
+    }
+
+    /* Изображение курса */
+    .course-image-container {
+        animation: scaleIn 0.8s ease-out;
+        overflow: hidden;
+        border-radius: 12px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        transition: all 0.4s ease;
+        position: relative;
+    }
+
+    .course-image-container:hover {
+        transform: scale(1.02);
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+    }
+
+    .course-image {
+        transition: all 0.8s ease;
+        width: 100%;
+        height: auto;
+    }
+
+    .course-image-container:hover .course-image {
+        transform: scale(1.1);
+    }
+
+    /* Информационная карточка */
+    .info-card {
+        margin-top: 2rem;
+        border: none;
+        border-radius: 12px;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.07);
+        transition: all 0.4s ease;
+        overflow: hidden;
+    }
+
+    .info-card:hover {
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
+        transform: translateY(-5px);
+    }
+
+    .info-card-header {
+        background: linear-gradient(45deg, #5a67d8, #8e54e9);
+        color: white;
+        padding: 1.2rem 1.5rem;
+        font-weight: 600;
+    }
+
+    .info-card-body {
+        padding: 1.5rem;
+    }
+
+    .info-list-item {
+        padding: 0.7rem 0;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        transition: all 0.3s ease;
+    }
+
+    .info-list-item:last-child {
+        border-bottom: none;
+    }
+
+    .info-list-item:hover {
+        transform: translateX(5px);
+    }
+
+    .info-list-item i {
+        color: #5a67d8;
+        margin-right: 10px;
+        width: 20px;
+        text-align: center;
+    }
+
+    /* Пустые состояния */
+    .empty-state {
+        padding: 2rem;
+        text-align: center;
+        color: #a0aec0;
+        background-color: #f7fafc;
+        border-radius: 8px;
+        font-style: italic;
+    }
+
+    /* Адаптивность */
+    @media (max-width: 768px) {
+        .course-title {
+            font-size: 2rem;
+        }
+
+        .course-description {
+            font-size: 1rem;
+        }
+
+        .course-actions {
+            flex-direction: column;
+        }
+
+        .course-actions .btn {
+            width: 100%;
+            margin-bottom: 0.5rem;
+        }
+    }
+</style>
+
+<div class="course-container">
+    <div class="course-header p-4">
+        <div class="row">
+            <div class="col-lg-8">
+                <h1 class="course-title">{{ course.title }}</h1>
+                <p class="course-description">{{ course.description }}</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="course-meta">
+                <div class="meta-item">
+                    <i class="bi bi-person-circle"></i>
+                    <span class="meta-label">Инструктор:</span>
+                    <span class="meta-value">{{ course.instructor.username }}</span>
+                </div>
+                <div class="meta-item">
+                    <i class="bi bi-calendar-check"></i>
+                    <span class="meta-label">Дата создания:</span>
+                    <span class="meta-value">{{ course.created_at|date:"d.m.Y" }}</span>
+                </div>
+            </div>
+
+            {% if user.is_authenticated %}
+                <div class="course-actions">
+                    {% if is_enrolled %}
+                        <form method="post" action="{% url 'unenroll_course' course.id %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger">
+                                <i class="bi bi-x-circle"></i> Отписаться от курса
+                            </button>
+                        </form>
+                    {% else %}
+                        <form method="post" action="{% url 'enroll_course' course.id %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-success">
+                                <i class="bi bi-check-circle"></i> Записаться на курс
+                            </button>
+                        </form>
+                    {% endif %}
+
+                    {% if course.instructor == user or user.profile.is_instructor %}
+                        <a href="{% url 'course_update' course.id %}" class="btn btn-warning">
+                            <i class="bi bi-pencil"></i> Редактировать курс
+                        </a>
+                        <a href="{% url 'course_delete' course.id %}" class="btn btn-danger">
+                            <i class="bi bi-trash"></i> Удалить курс
+                        </a>
+                    {% endif %}
+                </div>
+            {% endif %}
+
+            <div class="modules-section">
+                <h2 class="section-title">Модули курса</h2>
+
+                {% if course.modules.all %}
+                    <div class="accordion module-accordion" id="moduleAccordion">
+                        {% for module in course.modules.all %}
+                            <div class="accordion-item" data-module-id="{{ module.id }}">
+                                <h2 class="accordion-header" id="heading{{ module.id }}">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ module.id }}">
+                                        {{ module.title }}
+                                    </button>
+                                </h2>
+                                <div id="collapse{{ module.id }}" class="accordion-collapse collapse" aria-labelledby="heading{{ module.id }}" data-bs-parent="#moduleAccordion">
+                                    <div class="accordion-body">
+                                        <p>{{ module.description }}</p>
+
+                                        {% if module.lessons.all %}
+                                            <ul class="list-group lessons-list">
+                                                {% for lesson in module.lessons.all %}
+                                                    <li class="list-group-item lesson-item d-flex justify-content-between align-items-center">
+                                                        <a href="{% url 'lesson_detail' lesson.id %}" class="text-decoration-none lesson-link">
+                                                            <i class="bi bi-file-text me-2"></i>{{ lesson.title }}
+                                                        </a>
+                                                        {% if lesson.assignments.all %}
+                                                            <span class="badge assignment-badge rounded-pill">{{ lesson.assignments.all|length }} задание(й)</span>
+                                                        {% endif %}
+                                                    </li>
+                                                {% endfor %}
+                                            </ul>
+                                        {% else %}
+                                            <div class="empty-state">
+                                                <i class="bi bi-journal-x fs-4 mb-2 d-block"></i>
+                                                <p class="mb-0">В этом модуле пока нет уроков.</p>
+                                            </div>
+                                        {% endif %}
+
+                                        {% if course.instructor == user or user.profile.is_instructor %}
+                                            <div class="module-actions">
+                                                <a href="{% url 'lesson_create' module.id %}" class="btn btn-sm btn-outline-primary">
+                                                    <i class="bi bi-plus-circle"></i> Добавить урок
+                                                </a>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="empty-state">
+                        <i class="bi bi-journals fs-4 mb-2 d-block"></i>
+                        <p class="mb-0">В этом курсе пока нет модулей.</p>
+                    </div>
+                {% endif %}
+
+                {% if course.instructor == user or user.profile.is_instructor %}
+                    <div class="text-center mt-4">
+                        <a href="{% url 'module_create' course.id %}" class="btn btn-outline-primary">
+                            <i class="bi bi-plus-circle"></i> Добавить модуль
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="course-image-container mb-4">
+                {% if course.image %}
+                    <img src="{{ course.image.url }}" class="course-image" alt="{{ course.title }}">
+                {% else %}
+                    <img src="https://via.placeholder.com/400x300?text=Course+Image" class="course-image" alt="{{ course.title }}">
+                {% endif %}
+            </div>
+
+            <div class="info-card">
+                <div class="info-card-header">
+                    <h5 class="mb-0">О курсе</h5>
+                </div>
+                <div class="info-card-body">
+                    <ul class="list-unstyled">
+                        <li class="info-list-item"><i class="bi bi-book"></i> {{ course.modules.count }} модулей</li>
+                        <li class="info-list-item"><i class="bi bi-people"></i> {{ active_enrollments_count }} студентов</li>
+                        <li class="info-list-item"><i class="bi bi-calendar-check"></i> Обновлено {{ course.updated_at|date:"d.m.Y" }}</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Анимация появления контента
+    document.addEventListener('DOMContentLoaded', function() {
+        // Анимация для аккордеона
+        const moduleItems = document.querySelectorAll('.accordion-item');
+        moduleItems.forEach((item, index) => {
+            item.style.opacity = '0';
+            item.style.transform = 'translateY(20px)';
+
+            setTimeout(() => {
+                item.style.transition = 'all 0.5s ease';
+                item.style.opacity = '1';
+                item.style.transform = 'translateY(0)';
+            }, 100 + (index * 100));
+        });
+
+        // Подсветка открытого модуля по хешу URL
+        const hash = window.location.hash;
+        if (hash) {
+            const moduleId = hash.replace('#module-', '');
+            const moduleItem = document.querySelector(`[data-module-id="${moduleId}"]`);
+            if (moduleItem) {
+                const collapseEl = moduleItem.querySelector('.accordion-collapse');
+                if (collapseEl) {
+                    // Открываем аккордеон
+                    const bsCollapse = new bootstrap.Collapse(collapseEl, { toggle: true });
+
+                    // Плавный скролл к элементу
+                    setTimeout(() => {
+                        moduleItem.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+                        // Добавляем эффект подсветки
+                        moduleItem.style.animation = 'highlight 2s ease';
+                    }, 300);
+                }
+            }
+        }
+
+        // Анимация эффекта рябь для кнопок
+        const buttons = document.querySelectorAll('.btn');
+        buttons.forEach(button => {
+            button.addEventListener('click', function(e) {
+                const rect = button.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+
+                const circle = document.createElement('span');
+                circle.style.position = 'absolute';
+                circle.style.width = '1px';
+                circle.style.height = '1px';
+                circle.style.borderRadius = '50%';
+                circle.style.backgroundColor = 'rgba(255, 255, 255, 0.5)';
+                circle.style.transform = 'scale(0)';
+                circle.style.left = x + 'px';
+                circle.style.top = y + 'px';
+                circle.style.animation = 'ripple 0.6s linear';
+
+                button.appendChild(circle);
+
+                setTimeout(() => {
+                    circle.remove();
+                }, 700);
+            });
+        });
+    });
+
+    // Анимация эффекта ряби
+    document.head.insertAdjacentHTML('beforeend', `
+        <style>
+            @keyframes ripple {
+                0% {
+                    transform: scale(0);
+                    opacity: 1;
+                }
+                100% {
+                    transform: scale(500);
+                    opacity: 0;
+                }
+            }
+        </style>
+    `);
+</script>
+{% endblock %}

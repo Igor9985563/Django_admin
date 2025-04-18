@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+<style>
+    .profile-edit-card {
+        border: none;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .profile-edit-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+    }
+
+    .profile-edit-header {
+        background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+        color: white;
+        padding: 1.5rem;
+        border-bottom: none;
+    }
+
+    .profile-edit-header h2 {
+        font-weight: 600;
+        margin: 0;
+        letter-spacing: 0.5px;
+    }
+
+    .profile-edit-body {
+        padding: 2rem;
+        background-color: #f8f9fa;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+        border: none;
+        padding: 10px 25px;
+        border-radius: 50px;
+        font-weight: 500;
+        letter-spacing: 0.5px;
+        box-shadow: 0 4px 15px rgba(106, 17, 203, 0.3);
+        transition: all 0.3s ease;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(106, 17, 203, 0.4);
+    }
+
+    .btn-outline-secondary {
+        border: 2px solid #6a11cb;
+        color: #6a11cb;
+        padding: 10px 25px;
+        border-radius: 50px;
+        font-weight: 500;
+        letter-spacing: 0.5px;
+        transition: all 0.3s ease;
+    }
+
+    .btn-outline-secondary:hover {
+        background-color: #6a11cb;
+        color: white;
+        border-color: #6a11cb;
+    }
+
+    .form-control:focus {
+        border-color: #6a11cb;
+        box-shadow: 0 0 0 0.2rem rgba(106, 17, 203, 0.25);
+    }
+
+    .custom-file-input:focus ~ .custom-file-label {
+        border-color: #6a11cb;
+        box-shadow: 0 0 0 0.2rem rgba(106, 17, 203, 0.25);
+    }
+
+    .custom-file-label::after {
+        background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+        color: white;
+    }
+</style>
+
+<div class="row justify-content-center">
+    <div class="col-lg-8 col-md-10">
+        <div class="card profile-edit-card">
+            <div class="card-header profile-edit-header text-center">
+                <h2 class="mb-0">Редактирование профиля</h2>
+            </div>
+            <div class="card-body profile-edit-body">
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    {{ form|crispy }}
+                    <div class="mt-4 text-center">
+                        <button type="submit" class="btn btn-primary mr-3">Сохранить изменения</button>
+                        <a href="{% url 'profile' user.username %}" class="btn btn-outline-secondary">Отмена</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,159 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<style>
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(-20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+        20%, 40%, 60%, 80% { transform: translateX(5px); }
+    }
+
+    .delete-card {
+        animation: fadeIn 0.6s ease-out;
+        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+        border-radius: 8px;
+        overflow: hidden;
+        border: none;
+        transition: all 0.3s ease;
+    }
+
+    .delete-card:hover {
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        transform: translateY(-5px);
+    }
+
+    .card-header {
+        background: linear-gradient(to right, #ff4d4d, #ff6b6b);
+        color: white;
+        padding: 1.2rem;
+        border-bottom: none;
+    }
+
+    .card-body {
+        padding: 2rem;
+    }
+
+    .danger-text {
+        animation: fadeIn 0.8s ease-out;
+        padding: 10px;
+        border-left: 4px solid #ff4d4d;
+        background-color: rgba(255, 77, 77, 0.05);
+        border-radius: 0 4px 4px 0;
+    }
+
+    .course-title {
+        font-weight: 700;
+        color: #ff4d4d;
+        display: inline-block;
+        border-bottom: 2px dotted #ff4d4d;
+    }
+
+    .btn-danger {
+        background: linear-gradient(to right, #ff4d4d, #ff6b6b);
+        border: none;
+        padding: 10px 20px;
+        border-radius: 50px;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 8px rgba(255, 77, 77, 0.3);
+    }
+
+    .btn-danger:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba(255, 77, 77, 0.4);
+        background: linear-gradient(to right, #ff3333, #ff5252);
+    }
+
+    .btn-danger:active {
+        animation: shake 0.5s ease;
+    }
+
+    .btn-outline-secondary {
+        border-radius: 50px;
+        padding: 10px 20px;
+        transition: all 0.3s ease;
+    }
+
+    .btn-outline-secondary:hover {
+        transform: translateY(-2px);
+    }
+
+    .buttons-container {
+        display: flex;
+        gap: 15px;
+    }
+
+    .alert-icon {
+        font-size: 3rem;
+        color: #ff4d4d;
+        margin-bottom: 1rem;
+        animation: pulse 2s infinite;
+        display: block;
+        text-align: center;
+    }
+
+    @keyframes pulse {
+        0% { transform: scale(1); opacity: 1; }
+        50% { transform: scale(1.1); opacity: 0.8; }
+        100% { transform: scale(1); opacity: 1; }
+    }
+</style>
+
+<div class="row">
+    <div class="col-md-6 mx-auto">
+        <div class="card delete-card">
+            <div class="card-header">
+                <h2 class="mb-0">Удаление курса</h2>
+            </div>
+            <div class="card-body">
+                <div class="text-center">
+                    <i class="fas fa-exclamation-triangle alert-icon"></i>
+                </div>
+
+                <p class="lead">Вы уверены, что хотите удалить курс <span class="course-title">"{{ object.title }}"</span>?</p>
+
+                <div class="danger-text my-4">
+                    <p class="text-danger mb-0"><strong>Внимание!</strong> Это действие нельзя будет отменить. Все модули, уроки и задания курса также будут удалены.</p>
+                </div>
+
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="mt-4 buttons-container">
+                        <button type="submit" class="btn btn-danger">
+                            <i class="fas fa-trash-alt me-2"></i>Да, удалить
+                        </button>
+                        <a href="{% url 'course_detail' object.id %}" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left me-2"></i>Отмена
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Подтверждение при нажатии на кнопку удаления
+    document.querySelector('.btn-danger').addEventListener('click', function(e) {
+        if (!confirm('Вы действительно хотите удалить этот курс?')) {
+            e.preventDefault();
+        }
+    });
+
+    // Добавляем плавное появление элементов с задержкой
+    document.addEventListener('DOMContentLoaded', function() {
+        const card = document.querySelector('.delete-card');
+        card.style.opacity = '0';
+
+        setTimeout(() => {
+            card.style.opacity = '1';
+        }, 100);
+    });
+</script>
+
+{% endblock %}

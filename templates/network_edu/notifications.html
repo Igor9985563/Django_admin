@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-8">
+        <h1>Уведомления</h1>
+    </div>
+    <div class="col-md-4 text-end">
+        <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="mark_all_read" value="1">
+            <button type="submit" class="btn btn-outline-primary">
+                <i class="bi bi-check-all"></i> Отметить все как прочитанные
+            </button>
+        </form>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        {% if notifications %}
+            <div class="list-group">
+                {% for notification in notifications %}
+                    <a href="{% url 'mark_notification_read' notification.id %}" class="list-group-item list-group-item-action {% if not notification.is_read %}list-group-item-primary{% endif %}">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h5 class="mb-1">{{ notification.title }}</h5>
+                            <small>{{ notification.created_at|date:"d.m.Y H:i" }}</small>
+                        </div>
+                        <p class="mb-1">{{ notification.message }}</p>
+                        <small class="text-muted">
+                            {% if notification.notification_type == 'assignment' %}
+                                <i class="bi bi-journal-text"></i> Задание
+                            {% elif notification.notification_type == 'feedback' %}
+                                <i class="bi bi-chat-left-text"></i> Отзыв
+                            {% elif notification.notification_type == 'enrollment' %}
+                                <i class="bi bi-person-plus"></i> Запись на курс
+                            {% elif notification.notification_type == 'deadline' %}
+                                <i class="bi bi-clock"></i> Дедлайн
+                            {% else %}
+                                <i class="bi bi-info-circle"></i> Системное
+                            {% endif %}
+                            
+                            {% if notification.is_read %}
+                                <span class="ms-2">Прочитано</span>
+                            {% else %}
+                                <span class="ms-2 text-primary">Новое</span>
+                            {% endif %}
+                        </small>
+                    </a>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p class="text-muted">У вас нет уведомлений.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

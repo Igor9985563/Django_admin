@@ -1,0 +1,460 @@
+{% extends 'base.html' %}
+
+{% block extra_css %}
+<style>
+    .review-card {
+        border-radius: 12px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        overflow: hidden;
+        background: #fff;
+        margin-top: 30px;
+        margin-bottom: 30px;
+    }
+
+    .review-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+    }
+
+    .card-header {
+        background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+        color: white;
+        padding: 20px;
+        border-bottom: none;
+    }
+
+    .card-header h2, .card-header h5 {
+        margin: 0;
+        font-weight: 600;
+        animation: fadeIn 0.8s ease;
+    }
+
+    .card-body {
+        padding: 30px;
+    }
+
+    .submission-title {
+        color: #333;
+        font-weight: 600;
+        margin-bottom: 15px;
+        position: relative;
+        padding-bottom: 10px;
+        animation: slideInRight 0.5s ease;
+    }
+
+    .submission-title:after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 50px;
+        height: 3px;
+        background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+        animation: expandWidth 1s ease forwards;
+    }
+
+    .submission-meta {
+        color: #555;
+        margin-bottom: 25px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        animation: fadeIn 0.8s ease 0.2s both;
+    }
+
+    .submission-meta p {
+        margin: 0;
+        background-color: rgba(106, 17, 203, 0.05);
+        padding: 8px 15px;
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .submission-meta strong {
+        color: #444;
+    }
+
+    .nested-card {
+        border-radius: 8px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        overflow: hidden;
+        transition: all 0.3s ease;
+        margin-bottom: 25px;
+        border: none;
+    }
+
+    .nested-card:hover {
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .nested-card .card-header {
+        background: rgba(106, 17, 203, 0.1);
+        color: #333;
+        border-bottom: none;
+        padding: 15px 20px;
+    }
+
+    .nested-card .card-body {
+        padding: 20px;
+    }
+
+    .task-card {
+        animation: slideInUp 0.5s ease 0.3s both;
+    }
+
+    .solution-card {
+        animation: slideInUp 0.5s ease 0.5s both;
+    }
+
+    .attached-file {
+        display: inline-block;
+        background-color: #f8f9fa;
+        border: 1px solid #e9ecef;
+        border-radius: 6px;
+        padding: 10px 15px;
+        margin-top: 15px;
+        transition: all 0.3s ease;
+    }
+
+    .attached-file:hover {
+        background-color: #e9ecef;
+    }
+
+    .attached-file a {
+        color: #6a11cb;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .attached-file a:before {
+        content: "📎";
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+        animation: slideInUp 0.5s ease 0.7s both;
+    }
+
+    .form-label {
+        font-weight: 500;
+        color: #444;
+        margin-bottom: 8px;
+    }
+
+    .form-control, .form-select {
+        border-radius: 6px;
+        border: 1px solid #ddd;
+        padding: 12px;
+        transition: all 0.3s ease;
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: #6a11cb;
+        box-shadow: 0 0 0 0.2rem rgba(106, 17, 203, 0.25);
+    }
+
+    .form-select {
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='8' height='6' viewBox='0 0 8 6'%3e%3cpath fill='%23666' d='M4 5.5L0 1.5 1.5 0 4 2.5 6.5 0 8 1.5z'/%3e%3c/svg%3e");
+        background-repeat: no-repeat;
+        background-position: right 1rem center;
+        background-size: 8px 6px;
+    }
+
+    #status {
+        padding-right: 2.5rem;
+    }
+
+    .btn {
+        border-radius: 6px;
+        padding: 10px 20px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+        border: none;
+    }
+
+    .btn-primary:hover {
+        background: linear-gradient(135deg, #5a0cb2 0%, #1665e5 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(42, 118, 252, 0.3);
+    }
+
+    .btn-outline-secondary {
+        color: #555;
+        border: 1px solid #ccc;
+    }
+
+    .btn-outline-secondary:hover {
+        background-color: #f8f9fa;
+        color: #333;
+    }
+
+    .buttons-container {
+        display: flex;
+        gap: 15px;
+        animation: fadeIn 1s ease 0.9s both;
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+        }
+        to {
+            opacity: 1;
+        }
+    }
+
+    @keyframes slideInRight {
+        from {
+            transform: translateX(-20px);
+            opacity: 0;
+        }
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
+
+    @keyframes slideInUp {
+        from {
+            transform: translateY(20px);
+            opacity: 0;
+        }
+        to {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    }
+
+    @keyframes expandWidth {
+        from {
+            width: 0;
+        }
+        to {
+            width: 50px;
+        }
+    }
+
+    /* Status-specific styles */
+    .status-pending {
+        background-color: rgba(255, 193, 7, 0.2);
+        color: #856404;
+    }
+
+    .status-approved {
+        background-color: rgba(40, 167, 69, 0.2);
+        color: #155724;
+    }
+
+    .status-rejected {
+        background-color: rgba(220, 53, 69, 0.2);
+        color: #721c24;
+    }
+
+    /* Для адаптивности на мобильных устройствах */
+    @media (max-width: 768px) {
+        .review-card {
+            margin-top: 15px;
+            margin-bottom: 15px;
+        }
+
+        .card-body {
+            padding: 20px;
+        }
+
+        .submission-meta {
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .buttons-container {
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .btn {
+            width: 100%;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-10 mx-auto">
+        <div class="review-card card">
+            <div class="card-header">
+                <h2 class="mb-0">Проверка решения</h2>
+            </div>
+            <div class="card-body">
+                <h4 class="submission-title">{{ submission.assignment.title }}</h4>
+                <div class="submission-meta">
+                    <p><strong>Студент:</strong> <span class="student-name">{{ submission.student.username }}</span></p>
+                    <p><strong>Дата отправки:</strong> <span class="submission-date">{{ submission.submitted_at|date:"d.m.Y H:i" }}</span></p>
+                </div>
+
+                <div class="card nested-card task-card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">Задание</h5>
+                    </div>
+                    <div class="card-body">
+                        {{ submission.assignment.description|safe }}
+                    </div>
+                </div>
+
+                <div class="card nested-card solution-card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">Решение студента</h5>
+                    </div>
+                    <div class="card-body">
+                        {{ submission.content|safe }}
+
+                        {% if submission.file %}
+                            <div class="attached-file">
+                                <a href="{{ submission.file.url }}" target="_blank">{{ submission.file.name }}</a>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <form method="post" class="review-form">
+                    {% csrf_token %}
+                    <div class="mb-3 form-group">
+                        <label for="status" class="form-label">Статус</label>
+                        <select name="status" id="status" class="form-select">
+                            <option value="pending" {% if submission.status == 'pending' %}selected{% endif %} class="status-pending">На проверке</option>
+                            <option value="approved" {% if submission.status == 'approved' %}selected{% endif %} class="status-approved">Одобрено</option>
+                            <option value="rejected" {% if submission.status == 'rejected' %}selected{% endif %} class="status-rejected">Отклонено</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3 form-group">
+                        <label for="feedback" class="form-label">Отзыв</label>
+                        <textarea name="feedback" id="feedback" rows="4" class="form-control">{{ submission.feedback }}</textarea>
+                    </div>
+
+                    <div class="mb-3 form-group">
+                        <label for="score" class="form-label">Оценка (из {{ submission.assignment.points }} возможных)</label>
+                        <input type="number" name="score" id="score" class="form-control" min="0" max="{{ submission.assignment.points }}" value="{{ submission.score|default:'' }}">
+                    </div>
+
+                    <div class="buttons-container mt-4">
+                        <button type="submit" class="btn btn-primary">Сохранить оценку</button>
+                        <a href="{% url 'instructor_dashboard' %}" class="btn btn-outline-secondary">Отмена</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Анимация появления элементов формы
+        const formElements = document.querySelectorAll('.form-group');
+        formElements.forEach((element, index) => {
+            element.style.opacity = '0';
+            element.style.transform = 'translateY(20px)';
+            setTimeout(() => {
+                element.style.transition = 'all 0.5s ease';
+                element.style.opacity = '1';
+                element.style.transform = 'translateY(0)';
+            }, 500 + index * 100);
+        });
+
+        // Добавление класса к select в зависимости от выбранного значения
+        const statusSelect = document.getElementById('status');
+        if (statusSelect) {
+            updateSelectStyle(statusSelect);
+
+            statusSelect.addEventListener('change', function() {
+                updateSelectStyle(this);
+            });
+        }
+
+        // Анимация при отправке формы
+        const form = document.querySelector('.review-form');
+        if (form) {
+            form.addEventListener('submit', function(e) {
+                const submitButton = this.querySelector('button[type="submit"]');
+                submitButton.classList.add('submitting');
+                submitButton.innerHTML = '<span class="spinner"></span> Сохранение...';
+            });
+        }
+
+        // Подсветка прикрепленного файла при наведении
+        const fileLink = document.querySelector('.attached-file a');
+        if (fileLink) {
+            fileLink.addEventListener('mouseenter', function() {
+                this.closest('.attached-file').style.transform = 'translateY(-3px)';
+                this.style.color = '#5a0cb2';
+            });
+
+            fileLink.addEventListener('mouseleave', function() {
+                this.closest('.attached-file').style.transform = 'translateY(0)';
+                this.style.color = '#6a11cb';
+            });
+        }
+    });
+
+    function updateSelectStyle(select) {
+        // Удаляем все классы статуса
+        select.classList.remove('status-pending', 'status-approved', 'status-rejected');
+
+        // Добавляем класс в зависимости от выбранного значения
+        if (select.value === 'pending') {
+            select.classList.add('status-pending');
+        } else if (select.value === 'approved') {
+            select.classList.add('status-approved');
+        } else if (select.value === 'rejected') {
+            select.classList.add('status-rejected');
+        }
+    }
+</script>
+<style>
+    .submitting {
+        position: relative;
+        pointer-events: none;
+    }
+
+    .spinner {
+        display: inline-block;
+        width: 15px;
+        height: 15px;
+        border: 2px solid rgba(255,255,255,0.3);
+        border-radius: 50%;
+        border-top-color: #fff;
+        animation: spin 1s ease-in-out infinite;
+        margin-right: 5px;
+    }
+
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+
+    #status.status-pending {
+        border-color: #ffc107;
+        background-color: rgba(255, 193, 7, 0.1);
+    }
+
+    #status.status-approved {
+        border-color: #28a745;
+        background-color: rgba(40, 167, 69, 0.1);
+    }
+
+    #status.status-rejected {
+        border-color: #dc3545;
+        background-color: rgba(220, 53, 69, 0.1);
+    }
+</style>
+{% endblock %}

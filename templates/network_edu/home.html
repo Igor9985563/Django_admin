@@ -1,0 +1,430 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_head %}
+<!-- Подключение дополнительных стилей и библиотек -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css">
+<style>
+    /* Custom animations and styles */
+    .hero-section {
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        border-radius: 15px;
+        overflow: hidden;
+        position: relative;
+        transition: all 0.5s ease;
+    }
+
+
+    .hero-section:hover {
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        transform: translateY(-5px);
+    }
+
+    .course-card {
+        transition: all 0.3s ease;
+        border-radius: 12px;
+        overflow: hidden;
+        border: none;
+    }
+
+    .course-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15) !important;
+    }
+
+    .course-card .card-img-top {
+        height: 200px;
+        object-fit: cover;
+        transition: all 0.5s ease;
+    }
+
+    .course-card:hover .card-img-top {
+        transform: scale(1.05);
+    }
+
+    .feature-icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background: linear-gradient(145deg, #ffffff, #e6e6e6);
+        box-shadow: 5px 5px 10px #d9d9d9, -5px -5px 10px #ffffff;
+        margin-bottom: 1.5rem;
+        transition: all 0.3s ease;
+    }
+
+    .feature-box:hover .feature-icon {
+        transform: rotateY(180deg);
+        background: linear-gradient(145deg, #007bff, #0056b3);
+        color: white;
+    }
+
+    .btn-primary {
+        background: linear-gradient(to right, #0062cc, #0099ff);
+        border: none;
+        border-radius: 30px;
+        padding: 10px 25px;
+        position: relative;
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 7px 14px rgba(0, 123, 255, 0.25);
+    }
+
+    .btn-primary::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 300px;
+        height: 300px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 50%;
+        transform: translate(-50%, -50%) scale(0);
+        opacity: 0;
+        transition: all 0.5s ease;
+    }
+
+    .btn-primary:active::after {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 1;
+        transition: all 0s;
+    }
+
+    .btn-outline-secondary {
+        border-radius: 30px;
+        padding: 10px 25px;
+        transition: all 0.3s ease;
+    }
+
+    .btn-outline-secondary:hover {
+        transform: translateY(-3px);
+    }
+
+    .help-section {
+        position: relative;
+        overflow: hidden;
+    }
+
+    .help-section::before {
+        content: '';
+        position: absolute;
+        top: -100px;
+        left: 0;
+        width: 100%;
+        height: 100px;
+        background: linear-gradient(to bottom right, transparent 49%, #f8f9fa 50%);
+    }
+
+    .feature-section {
+        position: relative;
+        z-index: 1;
+        border-radius: 15px;
+    }
+
+    .floating {
+        animation: floating 3s ease-in-out infinite;
+    }
+
+    @keyframes floating {
+        0% { transform: translateY(0px); }
+        50% { transform: translateY(-15px); }
+        100% { transform: translateY(0px); }
+    }
+
+    .pulse {
+        animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+        100% { transform: scale(1); }
+    }
+
+    .badge-new {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background: linear-gradient(45deg, #FF512F, #F09819);
+        color: white;
+        padding: 5px 10px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        transform: rotate(5deg);
+        box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+        z-index: 2;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row align-items-center py-5 hero-section mb-5" data-aos="fade-up">
+    <div class="col-lg-6" data-aos="fade-right" data-aos-delay="100">
+        <h1 class="display-5 fw-bold animate__animated animate__fadeInUp">Образовательная платформа для сетевых администраторов</h1>
+        <p class="lead animate__animated animate__fadeInUp animate__delay-1s">Изучайте настройку и администрирование серверов и сетевых устройств, выполняйте практические задания и обменивайтесь проектами с другими участниками.</p>
+        <div class="d-grid gap-2 d-md-flex justify-content-md-start animate__animated animate__fadeInUp animate__delay-2s">
+            <a href="{% url 'course_list' %}" class="btn btn-primary btn-lg px-4 me-md-2">
+                <i class="bi bi-collection me-2"></i>Просмотреть курсы
+            </a>
+            {% if not user.is_authenticated %}
+                <a href="{% url 'register' %}" class="btn btn-outline-secondary btn-lg px-4">
+                    <i class="bi bi-person-plus me-2"></i>Регистрация
+                </a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<hr class="my-5">
+
+<div class="row mb-5">
+    <div class="col-12 text-center mb-4" data-aos="fade-up">
+        <h2 class="animate__animated animate__fadeInUp">Популярные курсы</h2>
+        <p class="text-muted animate__animated animate__fadeInUp animate__delay-1s">Начните обучение с наших лучших программ</p>
+    </div>
+
+    {% if courses %}
+        {% for course in courses %}
+            <div class="col-md-4 mb-4" data-aos="fade-up" data-aos-delay="{{ forloop.counter|add:'150' }}">
+                <div class="card course-card h-100 shadow-sm">
+                    {% if course.image %}
+                        <img src="{{ course.image.url }}" class="card-img-top object-fit-cover" alt="{{ course.title }}">
+                    {% else %}
+                        <div class="bg-light text-center py-5 course-placeholder">
+                            <i class="bi bi-book display-1 text-secondary"></i>
+                        </div>
+                    {% endif %}
+                    <div class="card-body">
+                        <h5 class="card-title">{{ course.title }}</h5>
+                        <div class="d-flex mb-3">
+                            <span class="badge bg-primary me-2"><i class="bi bi-clock me-1"></i> 8 недель</span>
+                            <span class="badge bg-secondary"><i class="bi bi-bar-chart me-1"></i> Начальный</span>
+                        </div>
+                        <p class="card-text">{{ course.description|truncatechars:100 }}</p>
+                    </div>
+                    <div class="card-footer bg-transparent border-top-0">
+                        <a href="{% url 'course_detail' course.id %}" class="btn btn-primary">
+                            <i class="bi bi-arrow-right me-1"></i>Подробнее
+                        </a>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    {% else %}
+        <div class="col-12 text-center" data-aos="fade-up">
+            <p>Пока нет доступных курсов.</p>
+        </div>
+    {% endif %}
+
+    <div class="col-12 text-center mt-3" data-aos="fade-up" data-aos-delay="300">
+        <a href="{% url 'course_list' %}" class="btn btn-outline-primary">
+            <i class="bi bi-grid-3x3-gap me-2"></i>Все курсы
+        </a>
+    </div>
+</div>
+
+<div class="row py-5 text-center help-section" data-aos="fade-up">
+    <div class="col-12">
+        <h2 class="mb-4 animate__animated animate__fadeInUp">Нужна помощь?</h2>
+        <p class="lead mb-4 animate__animated animate__fadeInUp animate__delay-1s">Ознакомьтесь с часто задаваемыми вопросами или свяжитесь с нами</p>
+        <a href="{% url 'faq' %}" class="btn btn-primary btn-lg pulse animate__animated animate__fadeInUp animate__delay-2s">
+            <i class="bi bi-question-circle me-2"></i>Часто задаваемые вопросы
+        </a>
+    </div>
+</div>
+
+<div class="row py-5 bg-light rounded-3 feature-section mt-5" data-aos="fade-up">
+    <div class="col-md-4 mb-4 mb-md-0" data-aos="fade-up" data-aos-delay="100">
+        <div class="text-center feature-box">
+            <div class="feature-icon">
+                <i class="bi bi-laptop fs-1 text-primary"></i>
+            </div>
+            <h3>Практические навыки</h3>
+            <p>Получите практические навыки настройки и администрирования сетевых устройств и серверов.</p>
+        </div>
+    </div>
+    <div class="col-md-4 mb-4 mb-md-0" data-aos="fade-up" data-aos-delay="200">
+        <div class="text-center feature-box">
+            <div class="feature-icon">
+                <i class="bi bi-people fs-1 text-primary"></i>
+            </div>
+            <h3>Сообщество</h3>
+            <p>Обменивайтесь опытом и проектами с другими участниками образовательной платформы.</p>
+        </div>
+    </div>
+    <div class="col-md-4" data-aos="fade-up" data-aos-delay="300">
+        <div class="text-center feature-box">
+            <div class="feature-icon">
+                <i class="bi bi-award fs-1 text-primary"></i>
+            </div>
+            <h3>Сертификация</h3>
+            <p>Получите подтверждение своих навыков после успешного прохождения курсов.</p>
+        </div>
+    </div>
+</div>
+
+<!-- Добавляем секцию счетчиков -->
+<div class="row text-center py-5 mt-4 mb-5" data-aos="fade-up">
+    <div class="col-12 mb-4">
+        <h2>Наши достижения</h2>
+    </div>
+    <div class="col-md-3 mb-4 mb-md-0">
+        <div class="counter-box">
+            <h2 class="display-4 fw-bold counter-num" id="studentsCounter">0</h2>
+            <p>Активных студентов</p>
+        </div>
+    </div>
+    <div class="col-md-3 mb-4 mb-md-0">
+        <div class="counter-box">
+            <h2 class="display-4 fw-bold counter-num" id="coursesCounter">0</h2>
+            <p>Доступных курсов</p>
+        </div>
+    </div>
+    <div class="col-md-3 mb-4 mb-md-0">
+        <div class="counter-box">
+            <h2 class="display-4 fw-bold counter-num" id="certificatesCounter">0</h2>
+            <p>Выданных сертификатов</p>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="counter-box">
+            <h2 class="display-4 fw-bold counter-num" id="ratingCounter">0</h2>
+            <p>Средняя оценка</p>
+        </div>
+    </div>
+</div>
+
+<!-- Добавляем секцию отзывов -->
+<div class="row bg-light py-5 rounded-3 mt-4" data-aos="fade-up">
+    <div class="col-12 text-center mb-4">
+        <h2>Отзывы наших студентов</h2>
+    </div>
+    <div class="col-md-4 mb-4" data-aos="fade-up" data-aos-delay="100">
+        <div class="card h-100 border-0 shadow-sm">
+            <div class="card-body">
+                <div class="d-flex align-items-center mb-3">
+                    <div>
+                        <h5 class="mb-0">Алексей Смирнов</h5>
+                        <div class="text-warning">
+                            <i class="bi bi-star-fill"></i>
+                            <i class="bi bi-star-fill"></i>
+                            <i class="bi bi-star-fill"></i>
+                            <i class="bi bi-star-fill"></i>
+                            <i class="bi bi-star-fill"></i>
+                        </div>
+                    </div>
+                </div>
+                <p class="card-text">«Отличная платформа для изучения сетевого администрирования. Практические задания очень помогли закрепить теоретические знания.»</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-4" data-aos="fade-up" data-aos-delay="200">
+        <div class="card h-100 border-0 shadow-sm">
+            <div class="card-body">
+                <div class="d-flex align-items-center mb-3">
+                    <div>
+                        <h5 class="mb-0">Екатерина Иванова</h5>
+                        <div class="text-warning">
+                            <i class="bi bi-star-fill"></i>
+                            <i class="bi bi-star-fill"></i>
+                            <i class="bi bi-star-fill"></i>
+                            <i class="bi bi-star-fill"></i>
+                            <i class="bi bi-star-half"></i>
+                        </div>
+                    </div>
+                </div>
+                <p class="card-text">«Получила сертификат после прохождения курса по настройке серверов. Теперь успешно применяю полученные знания в работе.»</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-4" data-aos="fade-up" data-aos-delay="300">
+        <div class="card h-100 border-0 shadow-sm">
+            <div class="card-body">
+                <div class="d-flex align-items-center mb-3">
+                    <div>
+                        <h5 class="mb-0">Дмитрий Петров</h5>
+                        <div class="text-warning">
+                            <i class="bi bi-star-fill"></i>
+                            <i class="bi bi-star-fill"></i>
+                            <i class="bi bi-star-fill"></i>
+                            <i class="bi bi-star-fill"></i>
+                            <i class="bi bi-star"></i>
+                        </div>
+                    </div>
+                </div>
+                <p class="card-text">«Сообщество очень дружелюбное, всегда можно получить помощь при возникновении вопросов или проблем в обучении.»</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<!-- Подключение библиотек для анимаций -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+<script>
+    // Инициализация AOS (Animate On Scroll)
+    document.addEventListener('DOMContentLoaded', function() {
+        AOS.init({
+            duration: 800,
+            easing: 'ease-in-out',
+            once: true
+        });
+
+        // Анимация счетчиков
+        function animateCounters() {
+            const counters = document.querySelectorAll('.counter-num');
+            const targetValues = [1500, 45, 950, 4.8]; // Целевые значения для счетчиков
+
+            counters.forEach((counter, index) => {
+                const target = targetValues[index];
+                const duration = 2000; // Длительность анимации в мс
+                const step = target / (duration / 16); // 16мс - примерное время одного фрейма
+
+                let current = 0;
+                const updateCounter = () => {
+                    current += step;
+                    if (current < target) {
+                        if (index === 3) { // Для средней оценки - показываем с десятичной точкой
+                            counter.textContent = (Math.round(current * 10) / 10).toFixed(1);
+                        } else {
+                            counter.textContent = Math.floor(current);
+                        }
+                        requestAnimationFrame(updateCounter);
+                    } else {
+                        if (index === 3) {
+                            counter.textContent = target.toFixed(1);
+                        } else {
+                            counter.textContent = target;
+                        }
+                    }
+                };
+
+                updateCounter();
+            });
+        }
+
+        // Запускаем анимацию счетчиков, когда прокручиваем до их видимости
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    animateCounters();
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.5 });
+
+        const countersSection = document.querySelector('.counter-num');
+        if (countersSection) {
+            observer.observe(countersSection);
+        }
+    });
+</script>
+{% endblock %}
+{% endblock %}

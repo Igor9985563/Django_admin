@@ -1,0 +1,144 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Header with welcome message -->
+    <div class="bg-gradient-primary text-blue p-4 rounded-lg shadow mb-4">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h1 class="fw-bold">Панель инструктора</h1>
+                <p class="lead mb-0">Управляйте своими курсами и взаимодействуйте со студентами</p>
+            </div>
+            <div>
+                <a href="{% url 'course_create' %}" class="btn btn-light text-primary">
+                    <i class="bi bi-plus-circle me-2"></i>Создать новый курс
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics Summary Cards -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card border-0 rounded-lg shadow-sm bg-white h-100">
+                <div class="card-body text-center p-4">
+                    <div class="mb-3">
+                        <span class="bg-primary bg-opacity-10 p-3 rounded-circle d-inline-block">
+                            <i class="bi bi-book text-primary fs-3"></i>
+                        </span>
+                    </div>
+                    <h2 class="display-4 fw-bold text-primary">{{ courses.count }}</h2>
+                    <p class="text-muted fs-5">Активных курсов</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-0 rounded-lg shadow-sm bg-white h-100">
+                <div class="card-body text-center p-4">
+                    <div class="mb-3">
+                        <span class="bg-success bg-opacity-10 p-3 rounded-circle d-inline-block">
+                            <i class="bi bi-people text-success fs-3"></i>
+                        </span>
+                    </div>
+                    <h2 class="display-4 fw-bold text-success">{{ total_students }}</h2>
+                    <p class="text-muted fs-5">Всего студентов</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-0 rounded-lg shadow-sm bg-white h-100">
+                <div class="card-body text-center p-4">
+                    <div class="mb-3">
+                        <span class="bg-warning bg-opacity-10 p-3 rounded-circle d-inline-block">
+                            <i class="bi bi-clock-history text-warning fs-3"></i>
+                        </span>
+                    </div>
+                    <h2 class="display-4 fw-bold text-warning">{{ pending_submissions.count }}</h2>
+                    <p class="text-muted fs-5">Ожидают проверки</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content Cards -->
+    <div class="row mb-4">
+        <!-- My Courses Card -->
+        <div class="col-md-6 mb-4 mb-md-0">
+            <div class="card border-0 rounded-lg shadow-sm h-100">
+                <div class="card-header bg-white border-0 pt-4 px-4">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h2 class="h4 mb-0 fw-bold"><i class="bi bi-collection me-2 text-primary"></i>Мои курсы</h2>
+                        <a href="{% url 'course_create' %}" class="btn btn-sm btn-outline-primary rounded-pill">
+                            <i class="bi bi-plus-circle me-1"></i> Новый курс
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body p-4">
+                    {% if courses %}
+                        <div class="list-group list-group-flush">
+                            {% for course in courses %}
+                                <a href="{% url 'course_detail' course.id %}" class="list-group-item list-group-item-action border-0 px-0 py-3">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h5 class="mb-1 fw-semibold">{{ course.title }}</h5>
+                                        <span class="badge bg-primary rounded-pill">{{ course.active_students_count }} студентов</span>
+                                    </div>
+                                    <p class="mb-1 text-muted">{{ course.description|truncatechars:100 }}</p>
+                                    <div class="d-flex align-items-center mt-2">
+                                        <i class="bi bi-calendar-date me-2 text-secondary"></i>
+                                        <small class="text-secondary">Создан: {{ course.created_at|date:"d.m.Y" }}</small>
+                                    </div>
+                                </a>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="text-center py-5">
+                            <i class="bi bi-journal-x text-muted display-4 mb-3"></i>
+                            <p class="lead text-muted">У вас пока нет созданных курсов.</p>
+                            <a href="{% url 'course_create' %}" class="btn btn-primary">Создать первый курс</a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Pending Submissions Card -->
+        <div class="col-md-6">
+            <div class="card border-0 rounded-lg shadow-sm h-100">
+                <div class="card-header bg-white border-0 pt-4 px-4">
+                    <h2 class="h4 mb-0 fw-bold"><i class="bi bi-check-circle me-2 text-warning"></i>Решения на проверке</h2>
+                </div>
+                <div class="card-body p-4">
+                    {% if pending_submissions %}
+                        <div class="list-group list-group-flush">
+                            {% for submission in pending_submissions %}
+                                <a href="{% url 'review_submission' submission.id %}" class="list-group-item list-group-item-action border-0 px-0 py-3">
+                                    <div class="d-flex w-100 justify-content-between align-items-center">
+                                        <h5 class="mb-1 fw-semibold">{{ submission.assignment.title }}</h5>
+                                        <span class="badge bg-warning text-dark">Ожидает проверки</span>
+                                    </div>
+                                    <div class="d-flex align-items-center mb-2">
+                                        <i class="bi bi-person me-2 text-secondary"></i>
+                                        <span class="text-secondary">{{ submission.student.username }}</span>
+                                    </div>
+                                    <div class="d-flex align-items-center">
+                                        <i class="bi bi-book me-2 text-secondary"></i>
+                                        <small class="text-secondary">{{ submission.assignment.lesson.module.course.title }}</small>
+                                        <i class="bi bi-clock ms-3 me-2 text-secondary"></i>
+                                        <small class="text-secondary">{{ submission.submitted_at|date:"d.m.Y H:i" }}</small>
+                                    </div>
+                                </a>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="text-center py-5">
+                            <i class="bi bi-check2-all text-muted display-4 mb-3"></i>
+                            <p class="lead text-muted">Все задания проверены!</p>
+                            <p class="text-muted">На данный момент нет решений, ожидающих проверки.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

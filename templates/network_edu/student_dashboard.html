@@ -1,0 +1,280 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<style>
+    .courses-container {
+        padding: 2rem 0;
+    }
+
+    .page-title {
+        font-weight: 700;
+        color: #333;
+        margin-bottom: 1.5rem;
+        position: relative;
+        display: inline-block;
+    }
+
+    .page-title:after {
+        content: '';
+        position: absolute;
+        bottom: -10px;
+        left: 0;
+        width: 60px;
+        height: 4px;
+        background: linear-gradient(45deg, #4776E6, #8E54E9);
+        border-radius: 2px;
+    }
+
+    .section-card {
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        border: none;
+        margin-bottom: 2rem;
+        transition: transform 0.3s ease;
+    }
+
+    .section-header {
+        background: linear-gradient(to right, #f8f9fa, #ffffff);
+        padding: 1.25rem 1.5rem;
+        border-bottom: 1px solid #f1f1f1;
+    }
+
+    .section-title {
+        margin: 0;
+        font-weight: 700;
+        font-size: 1.25rem;
+        color: #333;
+    }
+
+    .course-card {
+        border: none;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .course-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+    }
+
+    .course-card .card-img-top {
+        height: 180px;
+        object-fit: cover;
+    }
+
+    .course-card .card-title {
+        font-weight: 700;
+        font-size: 1.2rem;
+        margin-bottom: 0.75rem;
+        color: #333;
+    }
+
+    .course-card .card-text {
+        color: #6c757d;
+        font-size: 0.95rem;
+        margin-bottom: 1rem;
+    }
+
+    .course-card .text-muted small {
+        font-size: 0.85rem;
+    }
+
+    .course-btn {
+        background: linear-gradient(45deg, #4776E6, #8E54E9);
+        color: white;
+        border-radius: 30px;
+        padding: 0.5rem 1.5rem;
+        font-weight: 600;
+        border: none;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-block;
+        box-shadow: 0 4px 15px rgba(142, 84, 233, 0.2);
+    }
+
+    .course-btn:hover {
+        background: linear-gradient(45deg, #3A67D7, #7A3FDC);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 18px rgba(142, 84, 233, 0.3);
+        color: white;
+    }
+
+    .card-footer {
+        background-color: transparent;
+        padding-top: 0;
+    }
+
+    .table-custom {
+        border-collapse: separate;
+        border-spacing: 0 0.5rem;
+    }
+
+    .table-custom thead th {
+        border-bottom: none;
+        font-weight: 600;
+        color: #495057;
+        text-transform: uppercase;
+        font-size: 0.85rem;
+        letter-spacing: 0.5px;
+    }
+
+    .table-custom tbody tr {
+        background-color: #fff;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+        border-radius: 8px;
+        transition: transform 0.2s ease;
+    }
+
+    .table-custom tbody tr:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    }
+
+    .table-custom td {
+        vertical-align: middle;
+        padding: 1rem 0.75rem;
+        border-top: none;
+    }
+
+    .table-custom td:first-child {
+        border-top-left-radius: 8px;
+        border-bottom-left-radius: 8px;
+    }
+
+    .table-custom td:last-child {
+        border-top-right-radius: 8px;
+        border-bottom-right-radius: 8px;
+    }
+
+    .badge {
+        padding: 0.5em 0.8em;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        border-radius: 30px;
+    }
+
+    .badge.bg-warning {
+        background-color: #ffc107 !important;
+        color: #212529;
+    }
+
+    .badge.bg-success {
+        background-color: #28a745 !important;
+    }
+
+    .badge.bg-danger {
+        background-color: #dc3545 !important;
+    }
+
+    .empty-text {
+        color: #adb5bd;
+        font-style: italic;
+        text-align: center;
+        padding: 2rem 0;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container courses-container">
+    <h1 class="page-title">Мои курсы</h1>
+
+    <!-- Секция с курсами, на которые записан пользователь -->
+    <div class="section-card mb-4">
+        <div class="section-header">
+            <h5 class="section-title">Курсы, на которые вы записаны</h5>
+        </div>
+        <div class="card-body p-4">
+            {% if enrollments %}
+                <div class="row">
+                    {% for enrollment in enrollments %}
+                        <div class="col-md-4 mb-4">
+                            <div class="card h-100 course-card">
+                                {% if enrollment.course.image %}
+                                    <img src="{{ enrollment.course.image.url }}" class="card-img-top" alt="{{ enrollment.course.title }}">
+                                {% else %}
+                                    <img src="https://via.placeholder.com/300x200?text=Course+Image" class="card-img-top" alt="{{ enrollment.course.title }}">
+                                {% endif %}
+                                <div class="card-body">
+                                    <h5 class="card-title">{{ enrollment.course.title }}</h5>
+                                    <p class="card-text">{{ enrollment.course.description|truncatechars:100 }}</p>
+                                    <p class="text-muted">
+                                        <small>Инструктор: <strong>{{ enrollment.course.instructor.username }}</strong></small>
+                                    </p>
+                                </div>
+                                <div class="card-footer bg-transparent border-top-0 pb-3">
+                                    <a href="{% url 'course_detail' enrollment.course.id %}" class="course-btn">Перейти к курсу</a>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="empty-text">
+                    <i class="fas fa-book-open mb-3" style="font-size: 3rem; color: #e9ecef;"></i>
+                    <p>Вы не записаны ни на один курс.</p>
+                    <a href="{% url 'course_list' %}" class="course-btn">Просмотреть доступные курсы</a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Секция с решениями пользователя -->
+    <div class="section-card">
+        <div class="section-header">
+            <h5 class="section-title">Мои решения</h5>
+        </div>
+        <div class="card-body p-4">
+            {% if submissions %}
+                <div class="table-responsive">
+                    <table class="table table-custom">
+                        <thead>
+                            <tr>
+                                <th>Задание</th>
+                                <th>Курс</th>
+                                <th>Дата отправки</th>
+                                <th>Статус</th>
+                                <th>Оценка</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for submission in submissions %}
+                                <tr>
+                                    <td><strong>{{ submission.assignment.title }}</strong></td>
+                                    <td>{{ submission.assignment.lesson.module.course.title }}</td>
+                                    <td>{{ submission.submitted_at|date:"d.m.Y H:i" }}</td>
+                                    <td>
+                                        {% if submission.status == 'pending' %}
+                                            <span class="badge bg-warning">На проверке</span>
+                                        {% elif submission.status == 'approved' %}
+                                            <span class="badge bg-success">Одобрено</span>
+                                        {% else %}
+                                            <span class="badge bg-danger">Отклонено</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if submission.score %}
+                                            <strong>{{ submission.score }}</strong> / {{ submission.assignment.points }}
+                                        {% else %}
+                                            -
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="empty-text">
+                    <i class="fas fa-clipboard-check mb-3" style="font-size: 3rem; color: #e9ecef;"></i>
+                    <p>У вас пока нет отправленных решений.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

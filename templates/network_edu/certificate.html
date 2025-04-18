@@ -1,0 +1,454 @@
+{% extends 'base.html' %}
+
+{% block extra_css %}
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Montserrat:wght@400;500;600&display=swap');
+
+    .certificate-container {
+        max-width: 900px;
+        margin: 30px auto;
+        animation: fadeIn 1s ease;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .certificate {
+        position: relative;
+        background-color: #fff;
+        padding: 50px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        border-radius: 12px;
+    }
+
+    .certificate-border {
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        right: 20px;
+        bottom: 20px;
+        border: 2px solid #103a6f;
+        border-radius: 8px;
+        pointer-events: none;
+        z-index: 1;
+    }
+
+    .certificate-background {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        overflow: hidden;
+        opacity: 0.06;
+        z-index: 0;
+    }
+
+    .certificate-background:before {
+        content: '';
+        position: absolute;
+        width: 200%;
+        height: 200%;
+        top: -50%;
+        left: -50%;
+        background: radial-gradient(circle, transparent, transparent 30%, #103a6f 30%, #103a6f 32%, transparent 32%);
+        background-size: 25px 25px;
+        transform: rotate(30deg);
+    }
+
+    .certificate-corner {
+        position: absolute;
+        width: 100px;
+        height: 100px;
+        z-index: 2;
+    }
+
+    .corner-top-left {
+        top: 10px;
+        left: 10px;
+        border-top: 4px solid #103a6f;
+        border-left: 4px solid #103a6f;
+        border-top-left-radius: 8px;
+    }
+
+    .corner-top-right {
+        top: 10px;
+        right: 10px;
+        border-top: 4px solid #103a6f;
+        border-right: 4px solid #103a6f;
+        border-top-right-radius: 8px;
+    }
+
+    .corner-bottom-left {
+        bottom: 10px;
+        left: 10px;
+        border-bottom: 4px solid #103a6f;
+        border-left: 4px solid #103a6f;
+        border-bottom-left-radius: 8px;
+    }
+
+    .corner-bottom-right {
+        bottom: 10px;
+        right: 10px;
+        border-bottom: 4px solid #103a6f;
+        border-right: 4px solid #103a6f;
+        border-bottom-right-radius: 8px;
+    }
+
+    .certificate-content {
+        position: relative;
+        text-align: center;
+        z-index: 3;
+        padding: 20px 40px;
+    }
+
+    .certificate-header {
+        margin-bottom: 40px;
+    }
+
+    .certificate-logo {
+        max-width: 120px;
+        margin-bottom: 20px;
+    }
+
+    .certificate-title {
+        font-family: 'Cormorant Garamond', serif;
+        font-size: 52px;
+        font-weight: 700;
+        color: #103a6f;
+        margin-bottom: 15px;
+        letter-spacing: 1px;
+        position: relative;
+        display: inline-block;
+    }
+
+    .certificate-title:after {
+        content: '';
+        position: absolute;
+        left: 50%;
+        bottom: -10px;
+        width: 100px;
+        height: 3px;
+        background: linear-gradient(90deg, transparent, #103a6f, transparent);
+        transform: translateX(-50%);
+    }
+
+    .certificate-subtitle {
+        font-family: 'Montserrat', sans-serif;
+        font-size: 18px;
+        color: #546e7a;
+        font-weight: 400;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+    }
+
+    .certificate-name {
+        font-family: 'Cormorant Garamond', serif;
+        font-size: 42px;
+        font-weight: 600;
+        color: #0a2845;
+        margin: 40px 0 20px;
+        letter-spacing: 0.5px;
+    }
+
+    .certificate-course-intro {
+        font-family: 'Montserrat', sans-serif;
+        font-size: 18px;
+        color: #546e7a;
+        margin-bottom: 10px;
+    }
+
+    .certificate-course {
+        font-family: 'Cormorant Garamond', serif;
+        font-size: 30px;
+        font-weight: 600;
+        color: #103a6f;
+        margin-bottom: 30px;
+        position: relative;
+        display: inline-block;
+        padding: 0 20px;
+    }
+
+    .certificate-course:before,
+    .certificate-course:after {
+        content: '•';
+        position: absolute;
+        font-size: 24px;
+        color: #103a6f;
+        top: 50%;
+        transform: translateY(-50%);
+    }
+
+    .certificate-course:before {
+        left: 0;
+    }
+
+    .certificate-course:after {
+        right: 0;
+    }
+
+    .certificate-date {
+        font-family: 'Montserrat', sans-serif;
+        font-size: 16px;
+        color: #546e7a;
+        margin-bottom: 40px;
+    }
+
+    .certificate-signature-container {
+        display: flex;
+        justify-content: space-around;
+        margin-top: 60px;
+    }
+
+    .signature-block {
+        flex: 0 0 40%;
+        text-align: center;
+    }
+
+    .signature-img {
+        max-width: 150px;
+        margin-bottom: 10px;
+        opacity: 0.8;
+    }
+
+    .signature-line {
+        width: 80%;
+        margin: 10px auto;
+        border-top: 1px solid #cfd8dc;
+    }
+
+    .signature-name {
+        font-family: 'Montserrat', sans-serif;
+        font-size: 16px;
+        font-weight: 600;
+        color: #0a2845;
+    }
+
+    .signature-title {
+        font-family: 'Montserrat', sans-serif;
+        font-size: 14px;
+        color: #546e7a;
+        font-style: italic;
+    }
+
+    .certificate-id {
+        font-family: 'Montserrat', sans-serif;
+        font-size: 12px;
+        color: #7e8c92;
+        margin-top: 50px;
+        letter-spacing: 1px;
+    }
+
+    .certificate-seal {
+        position: absolute;
+        bottom: 60px;
+        right: 80px;
+        width: 120px;
+        height: 120px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transform: rotate(15deg);
+    }
+
+    .seal-border {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        border: 2px solid #103a6f;
+        border-radius: 50%;
+        animation: rotate 40s linear infinite;
+    }
+
+    .seal-inner {
+        position: absolute;
+        width: 90%;
+        height: 90%;
+        border: 1px dashed #103a6f;
+        border-radius: 50%;
+        animation: rotate 30s linear infinite reverse;
+    }
+
+    .seal-center {
+        width: 70%;
+        height: 70%;
+        background-color: rgba(16, 58, 111, 0.1);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: 'Montserrat', sans-serif;
+        font-size: 14px;
+        color: #103a6f;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    @keyframes rotate {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+
+    .action-buttons {
+        margin: 30px 0;
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .btn-print {
+        background: linear-gradient(135deg, #103a6f, #1565c0);
+        color: white;
+        border: none;
+        padding: 12px 25px;
+        border-radius: 50px;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        box-shadow: 0 4px 12px rgba(16, 58, 111, 0.3);
+        transition: all 0.3s ease;
+    }
+
+    .btn-print:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(16, 58, 111, 0.4);
+        background: linear-gradient(135deg, #0a2845, #0d47a1);
+    }
+
+    .btn-back {
+        background: transparent;
+        color: #103a6f;
+        border: 2px solid #103a6f;
+        padding: 10px 20px;
+        border-radius: 50px;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.3s ease;
+    }
+
+    .btn-back:hover {
+        background-color: rgba(16, 58, 111, 0.1);
+        transform: translateY(-3px);
+    }
+
+    @media print {
+        @page {
+            size: A4 landscape;
+            margin: 0;
+        }
+
+        .no-print {
+            display: none !important;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: white;
+        }
+
+        .certificate-container {
+            max-width: 100%;
+            margin: 0;
+            animation: none;
+        }
+
+        .certificate {
+            box-shadow: none;
+            padding: 40px;
+            border-radius: 0;
+        }
+
+        .certificate-border {
+            border: 3px solid #103a6f;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container certificate-container">
+    <div class="action-buttons no-print">
+        <a href="{% url 'student_dashboard' %}" class="btn btn-back">
+            <i class="bi bi-arrow-left"></i> Вернуться к панели студента
+        </a>
+        <button onclick="window.print()" class="btn btn-print">
+            <i class="bi bi-printer"></i> Печать сертификата
+        </button>
+    </div>
+
+    <div class="certificate">
+        <div class="certificate-background"></div>
+        <div class="certificate-border"></div>
+
+        <div class="certificate-corner corner-top-left"></div>
+        <div class="certificate-corner corner-top-right"></div>
+        <div class="certificate-corner corner-bottom-left"></div>
+        <div class="certificate-corner corner-bottom-right"></div>
+
+        <div class="certificate-content">
+            <div class="certificate-header">
+                <img src="/api/placeholder/120/60" alt="Логотип" class="certificate-logo">
+                <h1 class="certificate-title">Сертификат</h1>
+                <p class="certificate-subtitle">об успешном окончании курса</p>
+            </div>
+
+            <div class="certificate-name">{{ certificate.student.first_name }} {{ certificate.student.last_name }}</div>
+            <p class="certificate-course-intro">успешно завершил(а) курс</p>
+            <div class="certificate-course">"{{ certificate.course.title }}"</div>
+            <div class="certificate-date">{{ certificate.issue_date|date:"d.m.Y" }}</div>
+
+            <div class="certificate-signature-container">
+                <div class="signature-block">
+                    <svg class="signature-img" viewBox="0 0 200 60">
+                        <path d="M10,40 C20,20 30,50 40,30 C50,10 60,40 70,25 C80,10 90,50 100,30 C110,15 120,45 130,20 C140,5 150,30 160,20 C170,10 180,30 190,20"
+                              fill="none" stroke="#103a6f" stroke-width="2" />
+                    </svg>
+                    <div class="signature-line"></div>
+                    <div class="signature-name">{{ certificate.course.instructor.first_name }} {{ certificate.course.instructor.last_name }}</div>
+                    <div class="signature-title">Инструктор курса</div>
+                </div>
+
+                <div class="signature-block">
+                    <svg class="signature-img" viewBox="0 0 200 60">
+                        <path d="M20,30 C30,50 40,20 50,40 C60,20 80,60 90,30 C100,10 120,45 140,25 C160,10 170,40 180,25"
+                              fill="none" stroke="#103a6f" stroke-width="2" />
+                    </svg>
+                    <div class="signature-line"></div>
+                    <div class="signature-name">Елена Петрова</div>
+                    <div class="signature-title">Директор образовательного центра</div>
+                </div>
+            </div>
+
+            <div class="certificate-seal">
+                <div class="seal-border"></div>
+                <div class="seal-inner"></div>
+                <div class="seal-center">Сертифицировано</div>
+            </div>
+
+            <div class="certificate-id">
+                ID сертификата: {{ certificate.certificate_id }}
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Анимированное появление сертификата
+        const certificate = document.querySelector('.certificate');
+        setTimeout(() => {
+            certificate.style.transform = 'translateY(0)';
+            certificate.style.opacity = '1';
+        }, 300);
+    });
+</script>
+{% endblock %}
+{% endblock %}

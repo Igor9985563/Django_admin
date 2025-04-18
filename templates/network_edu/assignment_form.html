@@ -1,0 +1,229 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block extra_css %}
+<style>
+    .assignment-container {
+        animation: fadeIn 0.7s ease;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .assignment-card {
+        border-radius: 12px;
+        border: none;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        overflow: hidden;
+        transition: all 0.4s ease;
+    }
+
+    .assignment-card:hover {
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.12);
+    }
+
+    .card-header {
+        background: linear-gradient(135deg, #4e73df, #224abe);
+        color: white;
+        padding: 1.5rem;
+        border-bottom: none;
+    }
+
+    .card-header h2 {
+        font-weight: 600;
+        letter-spacing: -0.5px;
+        margin: 0;
+    }
+
+    .card-body {
+        padding: 2rem;
+    }
+
+    .form-control, .form-select {
+        border-radius: 8px;
+        padding: 0.75rem 1rem;
+        border: 1px solid #e0e0e0;
+        transition: all 0.3s ease;
+    }
+
+    .form-control:focus, .form-select:focus {
+        box-shadow: 0 0 0 3px rgba(78, 115, 223, 0.2);
+        border-color: #4e73df;
+    }
+
+    label {
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+        color: #495057;
+    }
+
+    .btn {
+        border-radius: 8px;
+        padding: 0.75rem 1.5rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+
+    .btn-primary {
+        background: linear-gradient(to right, #4e73df, #224abe);
+        border: none;
+        box-shadow: 0 4px 10px rgba(78, 115, 223, 0.3);
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 15px rgba(78, 115, 223, 0.4);
+    }
+
+    .btn-outline-secondary {
+        border: 1px solid #ced4da;
+        color: #6c757d;
+    }
+
+    .btn-outline-secondary:hover {
+        background-color: #f8f9fa;
+        color: #495057;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .course-badge {
+        display: inline-block;
+        background-color: rgba(255, 255, 255, 0.2);
+        border-radius: 30px;
+        padding: 0.35rem 0.85rem;
+        font-size: 0.85rem;
+        font-weight: 500;
+        margin-top: 0.5rem;
+    }
+
+    .breadcrumb {
+        display: flex;
+        background: transparent;
+        padding: 0;
+        margin-bottom: 1rem;
+    }
+
+    .breadcrumb-item {
+        font-size: 0.85rem;
+        color: rgba(255, 255, 255, 0.7);
+    }
+
+    .breadcrumb-item a {
+        color: rgba(255, 255, 255, 0.7);
+        text-decoration: none;
+    }
+
+    .breadcrumb-item a:hover {
+        color: white;
+    }
+
+    .breadcrumb-item + .breadcrumb-item::before {
+        content: "›";
+        color: rgba(255, 255, 255, 0.5);
+    }
+
+    .breadcrumb-item.active {
+        color: white;
+    }
+
+    .required-asterisk {
+        color: #dc3545;
+        margin-left: 2px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="assignment-container">
+    <div class="row">
+        <div class="col-md-10 mx-auto">
+            <div class="assignment-card card">
+                <div class="card-header">
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="{% url 'lessons' %}">Уроки</a></li>
+                            <li class="breadcrumb-item"><a href="{% url 'lesson_detail' lesson.id %}">{{ lesson.title }}</a></li>
+                            <li class="breadcrumb-item active">Новое задание</li>
+                        </ol>
+                    </nav>
+                    <h2 class="mb-1">Добавление задания</h2>
+                    <div class="course-badge">
+                        <i class="bi bi-book me-1"></i> {{ lesson.title }}
+                    </div>
+                </div>
+                <div class="card-body">
+                    <form method="post" id="assignmentForm">
+                        {% csrf_token %}
+                        {{ form|crispy }}
+                        <div class="mt-4 d-flex gap-2 justify-content-end">
+                            <a href="{% url 'lesson_detail' lesson.id %}" class="btn btn-outline-secondary btn-animation">
+                                <i class="bi bi-x-circle me-1"></i> Отмена
+                            </a>
+                            <button type="submit" class="btn btn-primary btn-animation">
+                                <i class="bi bi-check-circle me-1"></i> Сохранить
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{{ form.media }}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Анимация полей формы при фокусе
+        const formControls = document.querySelectorAll('.form-control, .form-select');
+        formControls.forEach(control => {
+            control.addEventListener('focus', function() {
+                this.parentElement.style.transition = 'transform 0.3s ease';
+                this.parentElement.style.transform = 'translateX(5px)';
+            });
+
+            control.addEventListener('blur', function() {
+                this.parentElement.style.transform = 'translateX(0)';
+            });
+        });
+
+        // Добавляем звездочки для обязательных полей
+        const requiredLabels = document.querySelectorAll('label[for].requiredField');
+        requiredLabels.forEach(label => {
+            if (!label.querySelector('.required-asterisk')) {
+                const asterisk = document.createElement('span');
+                asterisk.className = 'required-asterisk';
+                asterisk.textContent = ' *';
+                label.appendChild(asterisk);
+            }
+        });
+
+        // Подтверждение перед отменой, если есть данные
+        const cancelBtn = document.querySelector('a.btn-outline-secondary');
+        const form = document.getElementById('assignmentForm');
+
+        cancelBtn.addEventListener('click', function(e) {
+            const formElements = form.querySelectorAll('input[type="text"], textarea, select');
+            let hasData = false;
+
+            formElements.forEach(element => {
+                if (element.value.trim() !== '') {
+                    hasData = true;
+                }
+            });
+
+            if (hasData) {
+                if (!confirm('Вы уверены, что хотите отменить создание задания? Введенные данные будут потеряны.')) {
+                    e.preventDefault();
+                }
+            }
+        });
+    });
+</script>
+{% endblock %}

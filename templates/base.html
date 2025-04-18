@@ -1,0 +1,1276 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Образовательная платформа для сетевых администраторов{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #2154cd;
+            --bs-btn-padding-x: 0.15rem;
+            --secondary-color: #ff000f;
+            --primary-dark: #1a3a6c;
+            --secondary-dark: #c1303b;
+            --light-blue: #a8dadc;
+            --neutral-light: #f1faee;
+            --dark-text: #1d3557;
+            --transition-speed: 0.3s;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+            overflow-x: hidden;
+            position: relative;
+            color: var(--dark-text);
+        }
+
+
+
+        /* Анимация фона */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(34, 75, 143, 0.03) 0%, rgba(230, 57, 70, 0.03) 100%);
+            z-index: -1;
+        }
+
+        .page-transition {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        main {
+            flex: 1;
+            padding-top: 2rem;
+            padding-bottom: 3rem;
+        }
+
+        .footer {
+            margin-top: auto;
+            background: linear-gradient(90deg, var(--primary-dark) 0%, var(--primary-color) 100%);
+            color: white;
+            padding: 1.5rem 0;
+            box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar {
+            animation: navbarFadeIn 1s ease forwards;
+            opacity: 0;
+            transform: translateY(-20px);
+            backdrop-filter: blur(8px);
+            background-color: rgb(35, 83, 198);
+            box-shadow: 0 8px 16px rgba(0, 22, 76, 0.58);
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            z-index: 1000;
+        }
+
+        /* Анимация появления */
+        @keyframes navbarFadeIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Плавность при наведении */
+        .navbar-nav .nav-link,
+        .navbar-brand {
+            transition: color 0.3s ease, transform 0.3s ease;
+        }
+
+        .navbar-nav .nav-link:hover,
+        .navbar-brand:hover {
+            color: var(--primary-color);
+            transform: translateY(-2px);
+        }
+
+        /* Кнопки */
+        .btn-outline-light:hover {
+            background-color: var(--primary-color);
+            color: #fff;
+            border-color: var(--primary-color);
+            transition: all 0.3s ease;
+        }
+
+        .btn-light:hover {
+            background-color: var(--secondary-color);
+            color: #fff;
+            transition: all 0.3s ease;
+        }
+
+
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.6rem;
+            position: relative;
+            padding-left: 0.5rem;
+            margin-right: 2rem;
+            background: linear-gradient(90deg, var(--secondary-color), var(--primary-color));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent !important;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: all var(--transition-speed);
+        }
+
+        .navbar-brand:hover {
+            transform: scale(1.05);
+        }
+
+        .navbar-brand::before {
+            content: "";
+            position: absolute;
+            left: -10px;
+            top: 0;
+            width: 4px;
+            height: 100%;
+            background-color: var(--secondary-color);
+            border-radius: 2px;
+        }
+
+        .navbar.scrolled {
+            background-color: rgba(0, 0, 0, 0.85);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+        }
+
+        .nav-link {
+            color: rgba(255, 255, 255, 0.8) !important;
+            font-weight: 500;
+            margin: 0 0.3rem;
+            padding: 0.5rem 1rem !important;
+            border-radius: 4px;
+            transition: all var(--transition-speed);
+            position: relative;
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 0%;
+            height: 2px;
+            background-color: var(--secondary-color);
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            transition: width var(--transition-speed);
+        }
+
+        .nav-link:hover {
+            color: white !important;
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-link:hover::after {
+            width: 80%;
+        }
+
+        .nav-link.active {
+            color: white !important;
+            background-color: rgba(230, 57, 70, 0.2);
+        }
+
+        .nav-link.active::after {
+            width: 80%;
+        }
+
+        /* Кнопки */
+        .btn {
+            border-radius: 5px;
+            font-weight: 600;
+            transition: all var(--transition-speed);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+
+        .btn::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: -100%;
+            background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.2) 50%, rgba(255,255,255,0) 100%);
+            transition: all 0.5s ease;
+        }
+
+        .btn:hover::after {
+            left: 100%;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+            border-color: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background-color: var(--secondary-color);
+            border-color: var(--secondary-color);
+        }
+
+        .container {
+            max-width: 1400px; /* или любое другое значение */
+            width: 95%;
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--secondary-dark);
+            border-color: var(--secondary-dark);
+            transform: translateY(-2px);
+        }
+
+        .btn-outline-light {
+            border-width: 2px;
+        }
+
+        .btn-outline-light:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn-light {
+            background-color: white;
+            color: var(--primary-color);
+            border-color: white;
+        }
+
+        .btn-light:hover {
+            background-color: #f8f9fa;
+            color: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        /* Карточки курсов */
+        .course-card {
+            height: 100%;
+            border-radius: 10px;
+            overflow: hidden;
+            border: none;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.07);
+            transition: all var(--transition-speed);
+            position: relative;
+            z-index: 1;
+        }
+
+        .course-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            opacity: 0;
+            z-index: -1;
+            transition: opacity var(--transition-speed);
+        }
+
+        .course-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .course-card:hover::before {
+            opacity: 0.05;
+        }
+
+        .card-img-top {
+            height: 180px;
+            object-fit: cover;
+            border-bottom: 3px solid var(--primary-color);
+        }
+
+        .card-title {
+            color: var(--primary-color);
+            font-weight: 700;
+        }
+
+        .card-body {
+            padding: 1.5rem;
+        }
+
+        .card-footer {
+            background-color: rgba(0, 0, 0, 0.02);
+            border-top: none;
+            padding: 1rem 1.5rem;
+        }
+
+        /* Предупреждения */
+        .alert {
+            border: none;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            animation: slideDown 0.5s ease-out;
+        }
+
+        @keyframes slideDown {
+            from { transform: translateY(-20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .alert-success {
+            background-color: #d4edda;
+            border-left: 4px solid #28a745;
+        }
+
+        .alert-danger {
+            background-color: #f8d7da;
+            border-left: 4px solid #dc3545;
+        }
+
+        .alert-warning {
+            background-color: #fff3cd;
+            border-left: 4px solid #ffc107;
+        }
+
+        .alert-info {
+            background-color: #d1ecf1;
+            border-left: 4px solid #17a2b8;
+        }
+
+        /* Боковое меню уроков */
+        .lesson-sidebar {
+            position: sticky;
+            top: 100px;
+            background-color: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .lesson-sidebar .list-group-item {
+            border: none;
+            padding: 0.75rem 1rem;
+            margin-bottom: 5px;
+            border-radius: 5px !important;
+            transition: all var(--transition-speed);
+        }
+
+        .lesson-sidebar .list-group-item:hover {
+            background-color: rgba(34, 75, 143, 0.05);
+        }
+
+        .lesson-sidebar .list-group-item.active {
+            background-color: var(--primary-color);
+        }
+
+        /* Выпадающее меню пользователя */
+        .dropdown-menu {
+            border: none;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            padding: 0.5rem;
+            animation: fadeInDown 0.3s ease-out;
+        }
+
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .dropdown-item {
+            padding: 0.6rem 1rem;
+            border-radius: 5px;
+            transition: all var(--transition-speed);
+        }
+
+        .dropdown-item:hover {
+            background-color: rgba(34, 75, 143, 0.1);
+            color: var(--primary-color);
+        }
+
+        .dropdown-divider {
+            margin: 0.5rem 0;
+        }
+
+        /* Форма поиска */
+        .search-form {
+            position: relative;
+        }
+
+        .search-form .form-control {
+            padding-left: 2.5rem;
+            border-radius: 30px;
+            border: 2px solid rgba(0, 0, 0, 0.1);
+            transition: all var(--transition-speed);
+        }
+
+        .search-form .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.2rem rgba(34, 75, 143, 0.25);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6c757d;
+        }
+
+        /* Заголовки секций */
+        .section-title {
+            position: relative;
+            padding-bottom: 0.5rem;
+            margin-bottom: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 50px;
+            height: 3px;
+            background-color: var(--secondary-color);
+            border-radius: 3px;
+        }
+
+        /* Прогресс-бар */
+        .progress {
+            height: 8px;
+            border-radius: 4px;
+            background-color: #e9ecef;
+            margin-bottom: 1rem;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .progress-bar {
+            background: linear-gradient(90deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            border-radius: 4px;
+            transition: width 1s ease;
+        }
+
+        /* Значки */
+        .badge {
+            padding: 0.4rem 0.6rem;
+            border-radius: 30px;
+            font-weight: 500;
+            transition: all var(--transition-speed);
+        }
+
+        .badge-primary {
+            background-color: var(--primary-color);
+        }
+
+        .badge-secondary {
+            background-color: var(--secondary-color);
+        }
+
+        /* Анимированные иконки */
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+            background-color: rgba(34, 75, 143, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+            transition: all var(--transition-speed);
+            font-size: 1.5rem;
+            color: var(--primary-color);
+        }
+
+        .feature-icon:hover {
+            transform: rotateY(180deg);
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        /* Модальные окна */
+        .modal-content {
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .modal-header {
+            background-color: var(--primary-color);
+            color: white;
+            border-bottom: none;
+        }
+
+        .modal-footer {
+            border-top: none;
+        }
+
+        /* Страница входа и регистрации */
+        .auth-card {
+            max-width: 500px;
+            margin: 2rem auto;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .auth-header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .auth-form {
+            padding: 2rem;
+        }
+
+        .form-control {
+            border-radius: 5px;
+            padding: 0.75rem 1rem;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            transition: all var(--transition-speed);
+        }
+
+        .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.2rem rgba(34, 75, 143, 0.25);
+        }
+
+        /* Инструкторы */
+        .instructor-card {
+            border-radius: 10px;
+            overflow: hidden;
+            border: none;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: all var(--transition-speed);
+        }
+
+        .instructor-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .instructor-img {
+            width: 120px;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 50%;
+            margin: 0 auto;
+            border: 5px solid white;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Таблицы */
+        .table {
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .table thead th {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 1rem;
+        }
+
+        .table tbody tr {
+            transition: all var(--transition-speed);
+        }
+
+        .table tbody tr:hover {
+            background-color: rgba(34, 75, 143, 0.05);
+        }
+
+        /* Декоративные элементы */
+        .decorative-line {
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, var(--secondary-color) 0%, var(--primary-color) 100%);
+            margin: 2rem 0;
+            border-radius: 3px;
+        }
+
+        /* Адаптивный дизайн */
+        @media (max-width: 992px) {
+            .navbar-brand {
+                margin-right: 1rem;
+            }
+
+            .nav-link {
+                margin: 0.2rem 0;
+            }
+        }
+
+        @media (max-width: 768px) {
+            main {
+                padding-top: 1rem;
+                padding-bottom: 2rem;
+            }
+
+            .section-title {
+                font-size: 1.5rem;
+            }
+        }
+
+        /* Анимации при прокрутке */
+        .fade-in-up {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 1s ease, transform 1s ease;
+        }
+
+        .fade-in-up.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Tooltip */
+        .custom-tooltip {
+            position: relative;
+        }
+
+        .custom-tooltip:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .tooltip-text {
+            visibility: hidden;
+            width: 120px;
+            background-color: rgba(0, 0, 0, 0.8);
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 5px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -60px;
+            opacity: 0;
+            transition: opacity 0.3s, transform 0.3s;
+            transform: translateY(10px);
+        }
+
+        .tooltip-text::after {
+            content: "";
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: rgba(0, 0, 0, 0.8) transparent transparent transparent;
+        }
+
+        .gradient-text {
+            background: linear-gradient(270deg, #d1fffa, #00009c, #ff0000);
+            background-size: 400% 400%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: gradientShift 2s ease infinite;
+            font-weight: bold;
+            font-size: 1.5rem;
+            text-shadow: 0 0 10px rgba(255, 0, 255, 0.4);
+        }
+
+        @keyframes gradientShift {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-dark">
+            <div class="container">
+                <a class="navbar-brand gradient-text animate__animated animate__fadeIn" href="{% url 'home' %}">
+                    <i class="fas fa-network-wired me-2"></i>NetAdmin
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav me-auto">
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}" href="{% url 'home' %}">
+                                <i class="fas fa-home me-1"></i> Главная
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.resolver_match.url_name == 'course_list' %}active{% endif %}" href="{% url 'course_list' %}">
+                                <i class="fas fa-graduation-cap me-1"></i> Курсы
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.resolver_match.url_name == 'resource_list' %}active{% endif %}" href="{% url 'resource_list' %}">
+                                <i class="fas fa-book me-1"></i> Ресурсы
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.resolver_match.url_name == 'project_list' %}active{% endif %}" href="{% url 'project_list' %}">
+                                <i class="fas fa-exchange-alt me-1"></i> Обмен проектами
+                            </a>
+                        </li>
+                    </ul>
+
+                    <form class="search-form d-none d-lg-flex me-3">
+                        <div class="position-relative">
+                            <input type="search" class="form-control" placeholder="Поиск..." aria-label="Поиск">
+                            <i class="bi bi-search search-icon"></i>
+                        </div>
+                    </form>
+
+                    <div class="d-flex">
+                        {% if user.is_authenticated %}
+                            <div class="dropdown">
+                                <button class="btn btn-outline-light dropdown-toggle" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="fas fa-user-circle me-1"></i>
+                                    {{ user.username }}
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                                    {% if user.profile.is_instructor %}
+                                        <li>
+                                            <a class="dropdown-item" href="{% url 'instructor_dashboard' %}">
+                                                <i class="fas fa-chalkboard-teacher me-2 text-primary"></i> Панель инструктора
+                                            </a>
+                                        </li>
+                                    {% endif %}
+                                    <li>
+                                        <a class="dropdown-item" href="{% url 'student_dashboard' %}">
+                                            <i class="fas fa-book-reader me-2 text-primary"></i> Мои курсы
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href="{% url 'profile' user.username %}">
+                                            <i class="fas fa-id-card me-2 text-primary"></i> Профиль
+                                        </a>
+                                    </li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li>
+                                        <form method="post" action="{% url 'logout' %}">
+                                            {% csrf_token %}
+                                            <button type="submit" class="dropdown-item text-start w-100">
+                                                <i class="fas fa-sign-out-alt me-2 text-danger"></i> Выйти
+                                            </button>
+                                        </form>
+                                    </li>
+                                </ul>
+                            </div>
+                        {% else %}
+                            <a href="{% url 'login' %}" class="btn btn-outline-light me-2">
+                                <i class="fas fa-sign-in-alt me-1"></i> Войти
+                            </a>
+                            <a href="{% url 'register' %}" class="btn btn-light btn-register">
+                                <i class="fas fa-user-plus me-1"></i> Регистрация
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="py-4 page-transition">
+        <div class="container">
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                        <i class="fas {% if message.tags == 'success' %}fa-check-circle{% elif message.tags == 'danger' %}fa-exclamation-circle{% elif message.tags == 'warning' %}fa-exclamation-triangle{% elif message.tags == 'info' %}fa-info-circle{% endif %} me-2"></i>
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            {% block content %}
+            <!-- Здесь будет размещаться содержимое страницы -->
+            <div class="row mb-5 fade-in-up">
+                <div class="col-lg-6">
+                    <h1 class="display-4 fw-bold mb-4">Образовательная платформа<br> для сетевых администраторов</h1>
+                    <p class="lead">Начните свой путь к экспертизе в области сетевых технологий с нашими профессиональными курсами.</p>
+                    <div class="mt-4">
+                        <a href="{% url 'course_list' %}" class="btn btn-primary me-2">
+                            <i class="fas fa-laptop-code me-2"></i>Начать обучение
+                        </a>
+                        <a href="#" class="btn btn-outline-secondary">
+                            <i class="fas fa-info-circle me-2"></i>Узнать больше
+                        </a>
+                    </div>
+                </div>
+                <div class="col-lg-6 d-flex align-items-center justify-content-center">
+                    <img src="/api/placeholder/600/400" alt="Сетевые технологии" class="img-fluid rounded shadow">
+                </div>
+            </div>
+
+            <div class="decorative-line"></div>
+
+            <section class="mb-5 fade-in-up">
+                <h2 class="section-title">Популярные курсы</h2>
+                <div class="row">
+                    <div class="col-md-4 mb-4">
+                        <div class="course-card card">
+                            <img src="/api/placeholder/400/200" class="card-img-top" alt="Основы сетевых технологий">
+                            <div class="card-body">
+                                <span class="badge bg-primary mb-2">Начальный уровень</span>
+                                <h5 class="card-title">Основы сетевых технологий</h5>
+                                <p class="card-text">Базовый курс для начинающих администраторов.</p>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <small class="text-muted"><i class="fas fa-users me-1"></i> 1243 студента</small>
+                                    <small class="text-muted"><i class="fas fa-star me-1 text-warning"></i> 4.8</small>
+                                </div>
+                                <div class="progress mt-3">
+                                    <div class="progress-bar" role="progressbar" style="width: 100%" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
+                                </div>
+                            </div>
+                            <div class="card-footer bg-transparent">
+                                <a href="#" class="btn btn-primary w-100">Подробнее</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-4">
+                        <div class="course-card card">
+                            <img src="/api/placeholder/400/200" class="card-img-top" alt="Сетевая безопасность">
+                            <div class="card-body">
+                                <span class="badge bg-secondary mb-2">Продвинутый</span>
+                                <h5 class="card-title">Сетевая безопасность</h5>
+                                <p class="card-text">Защита корпоративных сетей от внешних угроз.</p>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <small class="text-muted"><i class="fas fa-users me-1"></i> 876 студентов</small>
+                                    <small class="text-muted"><i class="fas fa-star me-1 text-warning"></i> 4.9</small>
+                                </div>
+                                <div class="progress mt-3">
+                                    <div class="progress-bar" role="progressbar" style="width: 100%" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
+                                </div>
+                            </div>
+                            <div class="card-footer bg-transparent">
+                                <a href="#" class="btn btn-primary w-100">Подробнее</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-4">
+                        <div class="course-card card">
+                            <img src="/api/placeholder/400/200" class="card-img-top" alt="Облачные инфраструктуры">
+                            <div class="card-body">
+                                <span class="badge bg-primary mb-2">Средний уровень</span>
+                                <h5 class="card-title">Облачные инфраструктуры</h5>
+                                <p class="card-text">Развертывание и управление облачными сервисами.</p>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <small class="text-muted"><i class="fas fa-users me-1"></i> 965 студентов</small>
+                                    <small class="text-muted"><i class="fas fa-star me-1 text-warning"></i> 4.7</small>
+                                </div>
+                                <div class="progress mt-3">
+                                    <div class="progress-bar" role="progressbar" style="width: 100%" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
+                                </div>
+                            </div>
+                            <div class="card-footer bg-transparent">
+                                <a href="#" class="btn btn-primary w-100">Подробнее</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="text-center mt-4">
+                    <a href="{% url 'course_list' %}" class="btn btn-outline-primary">
+                        <i class="fas fa-th-list me-2"></i>Все курсы
+                    </a>
+                </div>
+            </section>
+
+            <div class="decorative-line"></div>
+
+            <section class="mb-5 fade-in-up">
+                <h2 class="section-title">Почему выбирают нас</h2>
+                <div class="row">
+                    <div class="col-md-4 mb-4">
+                        <div class="text-center">
+                            <div class="feature-icon mx-auto">
+                                <i class="fas fa-award"></i>
+                            </div>
+                            <h4>Сертифицированные инструкторы</h4>
+                            <p>Наши преподаватели — практикующие специалисты с богатым опытом работы в индустрии.</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-4">
+                        <div class="text-center">
+                            <div class="feature-icon mx-auto">
+                                <i class="fas fa-laptop-code"></i>
+                            </div>
+                            <h4>Практические задания</h4>
+                            <p>Вы сразу применяете полученные знания на практике, решая реальные задачи.</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-4">
+                        <div class="text-center">
+                            <div class="feature-icon mx-auto">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <h4>Сообщество профессионалов</h4>
+                            <p>Присоединяйтесь к нашему сообществу и находите единомышленников.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <div class="decorative-line"></div>
+
+            <section class="mb-5 fade-in-up">
+                <h2 class="section-title">Наши инструкторы</h2>
+                <div class="row">
+                    <div class="col-md-3 mb-4">
+                        <div class="instructor-card card text-center">
+                            <div class="card-body">
+                                <img src="/api/placeholder/150/150" class="instructor-img mb-3" alt="Инструктор">
+                                <h5 class="card-title">Иван Петров</h5>
+                                <p class="card-text text-muted">Эксперт по сетевой безопасности</p>
+                                <div class="social-icons mt-3">
+                                    <a href="#" class="text-primary me-2"><i class="fab fa-linkedin"></i></a>
+                                    <a href="#" class="text-primary me-2"><i class="fab fa-github"></i></a>
+                                    <a href="#" class="text-primary"><i class="fas fa-globe"></i></a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-4">
+                        <div class="instructor-card card text-center">
+                            <div class="card-body">
+                                <img src="/api/placeholder/150/150" class="instructor-img mb-3" alt="Инструктор">
+                                <h5 class="card-title">Мария Сидорова</h5>
+                                <p class="card-text text-muted">DevOps инженер</p>
+                                <div class="social-icons mt-3">
+                                    <a href="#" class="text-primary me-2"><i class="fab fa-linkedin"></i></a>
+                                    <a href="#" class="text-primary me-2"><i class="fab fa-github"></i></a>
+                                    <a href="#" class="text-primary"><i class="fas fa-globe"></i></a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-4">
+                        <div class="instructor-card card text-center">
+                            <div class="card-body">
+                                <img src="/api/placeholder/150/150" class="instructor-img mb-3" alt="Инструктор">
+                                <h5 class="card-title">Алексей Васильев</h5>
+                                <p class="card-text text-muted">Администратор Linux</p>
+                                <div class="social-icons mt-3">
+                                    <a href="#" class="text-primary me-2"><i class="fab fa-linkedin"></i></a>
+                                    <a href="#" class="text-primary me-2"><i class="fab fa-github"></i></a>
+                                    <a href="#" class="text-primary"><i class="fas fa-globe"></i></a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-4">
+                        <div class="instructor-card card text-center">
+                            <div class="card-body">
+                                <img src="/api/placeholder/150/150" class="instructor-img mb-3" alt="Инструктор">
+                                <h5 class="card-title">Елена Смирнова</h5>
+                                <p class="card-text text-muted">Специалист по облачным системам</p>
+                                <div class="social-icons mt-3">
+                                    <a href="#" class="text-primary me-2"><i class="fab fa-linkedin"></i></a>
+                                    <a href="#" class="text-primary me-2"><i class="fab fa-github"></i></a>
+                                    <a href="#" class="text-primary"><i class="fas fa-globe"></i></a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <div class="decorative-line"></div>
+
+            <section class="mb-5 fade-in-up">
+                <h2 class="section-title">Отзывы наших студентов</h2>
+                <div class="row">
+                    <div class="col-md-6 mb-4">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <div class="d-flex mb-3">
+                                    <img src="/api/placeholder/50/50" class="rounded-circle me-3" alt="Студент">
+                                    <div>
+                                        <h5 class="mb-0">Андрей К.</h5>
+                                        <small class="text-muted">Системный администратор</small>
+                                    </div>
+                                </div>
+                                <p class="card-text">
+                                    <i class="fas fa-quote-left me-2 text-primary opacity-50"></i>
+                                    Прошел курс по сетевой безопасности и сразу же применил полученные знания на практике. Очень доволен результатом, теперь наша корпоративная сеть намного надежнее защищена.
+                                    <i class="fas fa-quote-right ms-2 text-primary opacity-50"></i>
+                                </p>
+                                <div class="text-warning">
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-4">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <div class="d-flex mb-3">
+                                    <img src="/api/placeholder/50/50" class="rounded-circle me-3" alt="Студент">
+                                    <div>
+                                        <h5 class="mb-0">Татьяна М.</h5>
+                                        <small class="text-muted">Руководитель IT-отдела</small>
+                                    </div>
+                                </div>
+                                <p class="card-text">
+                                    <i class="fas fa-quote-left me-2 text-primary opacity-50"></i>
+                                    Отличная платформа для профессионального развития. Обучили всю нашу IT-команду основам облачных технологий. Теперь мы эффективно используем облачные сервисы для наших проектов.
+                                    <i class="fas fa-quote-right ms-2 text-primary opacity-50"></i>
+                                </p>
+                                <div class="text-warning">
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star-half-alt"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            {% endblock %}
+        </div>
+    </main>
+
+    <footer class="footer py-4">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4 mb-4 mb-md-0">
+                    <h5 class="text-white mb-3">NetAdmin</h5>
+                    <p class="text-white-50 mb-0">Образовательная платформа для сетевых администраторов. Профессиональные курсы, опытные инструкторы и практические навыки.</p>
+                    <div class="mt-3">
+                        <a href="https://t.me/forigor998" class="text-white-50 me-3 fs-5"><i class="fab fa-telegram"></i></a>
+                        <a href="https://wa.me/77054273029" class="text-white-50 me-3 fs-5"><i class="fab fa-whatsapp"></i></a>
+                        <a href="https://www.linkedin.com/in/igor-belokurov-76475434b/" class="text-white-50 me-3 fs-5"><i class="fab fa-linkedin"></i></a>
+                        <a href="https://github.com/Igor9985563" class="text-white-50 me-3 fs-5"><i class="fab fa-github"></i></a>
+                    </div>
+                </div>
+                <div class="col-md-2 mb-4 mb-md-0">
+                    <h5 class="text-white mb-3">Ссылки</h5>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="{% url 'home' %}" class="text-white-50 text-decoration-none">Главная</a></li>
+                        <li class="mb-2"><a href="{% url 'course_list' %}" class="text-white-50 text-decoration-none">Курсы</a></li>
+                        <li class="mb-2"><a href="{% url 'resource_list' %}" class="text-white-50 text-decoration-none">Ресурсы</a></li>
+                        <li class="mb-2"><a href="{% url 'about' %}" class="text-white-50 text-decoration-none">О нас</a></li>
+                        <li><a href="{% url 'contact' %}" class="text-white-50 text-decoration-none">Контакты</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-3 mb-4 mb-md-0">
+                    <h5 class="text-white mb-3">Категории курсов</h5>
+                    <ul class="list-unstyled">
+                        <li class="mb-2">
+                            <a href="{% url 'course_list' %}?category=1" class="text-white-50 text-decoration-none">Сетевые технологии</a>
+                        </li>
+                        <li class="mb-2">
+                            <a href="{% url 'course_list' %}?category=2" class="text-white-50 text-decoration-none">Информационная безопасность</a>
+                        </li>
+                        <li class="mb-2">
+                            <a href="{% url 'course_list' %}?category=3" class="text-white-50 text-decoration-none">Облачные вычисления</a>
+                        </li>
+                        <li class="mb-2">
+                            <a href="{% url 'course_list' %}?category=4" class="text-white-50 text-decoration-none">Операционные системы</a>
+                        </li>
+                        <li>
+                            <a href="{% url 'course_list' %}?category=5" class="text-white-50 text-decoration-none">DevOps практики</a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="col-md-3">
+                    <h5 class="text-white mb-3">Подписка на новости</h5>
+                    <p class="text-white-50">Будьте в курсе новых курсов и специальных предложений.</p>
+                    <form class="mt-3">
+                        <div class="input-group mb-3">
+                            <input type="email" class="form-control" placeholder="Email" aria-label="Email">
+                            <button class="btn btn-secondary" type="button">Подписаться</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="border-top border-secondary pt-4 mt-4 text-center text-white-50">
+                <p class="mb-0">&copy; {% now "Y" %} NetAdmin. Все права защищены.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Кнопка прокрутки вверх -->
+    <button id="scrollTopBtn" class="btn btn-primary rounded-circle position-fixed bottom-0 end-0 m-4 d-none" style="width: 45px; height: 45px; z-index: 1000;">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+
+        document.addEventListener('scroll', function () {
+            const nav = document.querySelector('.navbar');
+            if (window.scrollY > 50) {
+                nav.classList.add('scrolled');
+            } else {
+                nav.classList.remove('scrolled');
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Показываем toast через 1 секунду после загрузки страницы
+            setTimeout(function() {
+                const cookieToast = new bootstrap.Toast(document.getElementById('cookieToast'));
+                cookieToast.show();
+            }, 1000);
+
+            // Анимация элементов при прокрутке
+            const fadeElements = document.querySelectorAll('.fade-in-up');
+
+            function checkFade() {
+                fadeElements.forEach(element => {
+                    const elementPosition = element.getBoundingClientRect().top;
+                    const screenPosition = window.innerHeight / 1.2;
+
+                    if (elementPosition < screenPosition) {
+                        element.classList.add('visible');
+                    }
+                });
+            }
+
+            // Проверка при загрузке страницы
+            checkFade();
+
+            // Проверка при прокрутке
+            window.addEventListener('scroll', checkFade);
+
+            // Кнопка прокрутки вверх
+            const scrollBtn = document.getElementById('scrollTopBtn');
+
+            window.addEventListener('scroll', function() {
+                if (window.pageYOffset > 300) {
+                    scrollBtn.classList.remove('d-none');
+                    scrollBtn.classList.add('animate__animated', 'animate__fadeIn');
+                } else {
+                    scrollBtn.classList.add('d-none');
+                    scrollBtn.classList.remove('animate__animated', 'animate__fadeIn');
+                }
+            });
+
+            scrollBtn.addEventListener('click', function() {
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
+            });
+
+            // Анимация для карточек курсов
+            const courseCards = document.querySelectorAll('.course-card');
+            courseCards.forEach((card, index) => {
+                card.style.animationDelay = `${index * 0.1}s`;
+                card.classList.add('animate__animated', 'animate__fadeInUp');
+            });
+
+            // Анимация для иконок
+            const featureIcons = document.querySelectorAll('.feature-icon');
+            featureIcons.forEach((icon, index) => {
+                icon.addEventListener('mouseenter', function() {
+                    this.classList.add('animate__animated', 'animate__flip');
+                });
+
+                icon.addEventListener('animationend', function() {
+                    this.classList.remove('animate__animated', 'animate__flip');
+                });
+            });
+
+            // Подсветка активного пункта меню
+            const currentLocation = window.location.pathname;
+            const navLinks = document.querySelectorAll('.nav-link');
+
+            navLinks.forEach(link => {
+                if (link.getAttribute('href') === currentLocation) {
+                    link.classList.add('active');
+                }
+            });
+
+            // Hover-эффект для всех кнопок
+            const buttons = document.querySelectorAll('.btn');
+            buttons.forEach(button => {
+                button.addEventListener('mouseenter', function() {
+                    this.classList.add('animate__animated', 'animate__pulse');
+                });
+
+                button.addEventListener('animationend', function() {
+                    this.classList.remove('animate__animated', 'animate__pulse');
+                });
+            });
+        });
+
+        // Эффект перехода между страницами
+        document.addEventListener('click', function(e) {
+            const target = e.target;
+
+            // Проверяем, является ли элемент ссылкой или его родителем является ссылка
+            const link = target.closest('a');
+
+            if (link && !link.classList.contains('no-transition') &&
+                link.getAttribute('href') &&
+                link.getAttribute('href').indexOf('#') !== 0 &&
+                link.getAttribute('target') !== '_blank') {
+
+                e.preventDefault();
+
+                const url = link.getAttribute('href');
+
+                // Анимация затухания перед переходом
+                document.querySelector('main').style.opacity = '0';
+                document.querySelector('main').style.transform = 'translateY(20px)';
+                document.querySelector('main').style.transition = 'opacity 0.3s, transform 0.3s';
+
+                setTimeout(function() {
+                    window.location.href = url;
+                }, 300);
+            }
+        });
+
+        // Анимация для выпадающего меню
+        const dropdowns = document.querySelectorAll('.dropdown');
+        dropdowns.forEach(dropdown => {
+            dropdown.addEventListener('show.bs.dropdown', function() {
+                const menu = this.querySelector('.dropdown-menu');
+                menu.classList.add('animate__animated', 'animate__fadeInDown');
+                menu.style.animationDuration = '0.3s';
+            });
+
+            dropdown.addEventListener('hide.bs.dropdown', function() {
+                const menu = this.querySelector('.dropdown-menu');
+                menu.classList.remove('animate__animated', 'animate__fadeInDown');
+            });
+        });
+    </script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

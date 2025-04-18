@@ -1,0 +1,456 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+<style>
+    /* Основные анимации */
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes scaleIn {
+        from { transform: scale(0.95); opacity: 0; }
+        to { transform: scale(1); opacity: 1; }
+    }
+
+    @keyframes shimmer {
+        0% { background-position: -1000px 0; }
+        100% { background-position: 1000px 0; }
+    }
+
+    @keyframes borderGlow {
+        0% { border-color: #5a67d8; }
+        50% { border-color: #8e54e9; }
+        100% { border-color: #5a67d8; }
+    }
+
+    /* Общие стили контейнера */
+    .form-container {
+        animation: fadeIn 0.8s ease-out;
+        padding: 1rem 0;
+    }
+
+    /* Стили карточки */
+    .form-card {
+        border: none;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+        transition: all 0.4s ease;
+        animation: scaleIn 0.6s ease-out;
+    }
+
+    .form-card:hover {
+        box-shadow: 0 12px 35px rgba(0, 0, 0, 0.12);
+        transform: translateY(-5px);
+    }
+
+    /* Заголовок карточки */
+    .card-header {
+        background: linear-gradient(135deg, #5a67d8, #8e54e9);
+        padding: 1.5rem;
+        border-bottom: none;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .card-header h2 {
+        color: white;
+        font-weight: 700;
+        margin: 0;
+        position: relative;
+        z-index: 2;
+    }
+
+    .card-header::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0));
+        transform: skewY(-3deg) translateY(20px);
+        z-index: 1;
+    }
+
+    /* Тело карточки */
+    .card-body {
+        padding: 2rem;
+        background-color: #fff;
+    }
+
+    /* Стили для полей формы */
+    .form-control, .custom-select {
+        border-radius: 8px;
+        padding: 12px 15px;
+        border: 1px solid #e2e8f0;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.02);
+    }
+
+    .form-control:focus, .custom-select:focus {
+        border-color: #5a67d8;
+        box-shadow: 0 0 0 3px rgba(90, 103, 216, 0.15);
+    }
+
+    /* Улучшенные метки полей */
+    label {
+        font-weight: 600;
+        color: #4a5568;
+        margin-bottom: 8px;
+        transition: all 0.2s ease;
+    }
+
+    .form-group:focus-within label {
+        color: #5a67d8;
+    }
+
+    /* Секция кнопок */
+    .button-section {
+        margin-top: 2rem;
+        display: flex;
+        gap: 12px;
+        align-items: center;
+    }
+
+    /* Стили кнопок */
+    .btn {
+        border-radius: 50px;
+        padding: 12px 25px;
+        font-weight: 600;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .btn::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 10px;
+        height: 10px;
+        background: rgba(255, 255, 255, 0.3);
+        border-radius: 50%;
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(1);
+        transition: transform 0.6s, opacity 0.6s;
+    }
+
+    .btn:active::after {
+        transform: translate(-50%, -50%) scale(20);
+        opacity: 1;
+        transition: 0s;
+    }
+
+    .btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .btn:active {
+        transform: translateY(0);
+    }
+
+    /* Основная кнопка */
+    .btn-primary {
+        background: linear-gradient(45deg, #5a67d8, #8e54e9);
+        border: none;
+        box-shadow: 0 4px 15px rgba(90, 103, 216, 0.3);
+    }
+
+    .btn-primary:hover {
+        background: linear-gradient(45deg, #4c56b8, #7d45d8);
+        box-shadow: 0 6px 20px rgba(90, 103, 216, 0.4);
+    }
+
+    /* Кнопка отмены */
+    .btn-outline-secondary {
+        border: 2px solid #e2e8f0;
+        color: #4a5568;
+        background: transparent;
+    }
+
+    .btn-outline-secondary:hover {
+        background-color: #f7fafc;
+        color: #2d3748;
+        border-color: #cbd5e0;
+    }
+
+    /* Анимация для загрузки изображения */
+    .form-file {
+        position: relative;
+        overflow: hidden;
+        padding: 12px;
+        border: 2px dashed #e2e8f0;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+        text-align: center;
+        background-color: #f8fafc;
+    }
+
+    .form-file:hover, .form-file:focus-within {
+        border-color: #5a67d8;
+        background-color: #edf2f7;
+    }
+
+    .form-file.dragging {
+        border-color: #5a67d8;
+        animation: borderGlow 1.5s infinite;
+        background-color: rgba(90, 103, 216, 0.05);
+    }
+
+    /* Адаптивность */
+    @media (max-width: 768px) {
+        .card-body {
+            padding: 1.5rem;
+        }
+
+        .button-section {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .btn {
+            width: 100%;
+            margin-bottom: 10px;
+        }
+    }
+
+    /* Улучшения для Crispy Forms */
+    .asteriskField {
+        color: #5a67d8;
+        margin-left: 3px;
+    }
+
+    .invalid-feedback {
+        background-color: rgba(229, 62, 62, 0.05);
+        border-left: 3px solid #e53e3e;
+        padding: 8px 12px;
+        border-radius: 0 4px 4px 0;
+        animation: fadeIn 0.3s ease-out;
+    }
+
+    .valid-feedback {
+        background-color: rgba(56, 161, 105, 0.05);
+        border-left: 3px solid #38a169;
+        padding: 8px 12px;
+        border-radius: 0 4px 4px 0;
+        animation: fadeIn 0.3s ease-out;
+    }
+
+    /* Эффект фокуса на группу формы */
+    .form-group {
+        transition: all 0.3s ease;
+        padding: 6px;
+        border-radius: 8px;
+        margin-bottom: 1.2rem;
+    }
+
+    .form-group:focus-within {
+        background-color: rgba(247, 250, 252, 0.8);
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.03);
+    }
+
+    /* Анимация текстового поля при фокусе */
+    textarea.form-control {
+        min-height: 120px;
+        transition: all 0.3s ease;
+    }
+
+    textarea.form-control:focus {
+        min-height: 150px;
+    }
+
+    /* Улучшение для отображения ошибок */
+    .alert-danger {
+        border: none;
+        border-radius: 8px;
+        background-color: #fff5f5;
+        border-left: 4px solid #e53e3e;
+        color: #c53030;
+        animation: fadeIn 0.5s ease-out;
+    }
+</style>
+
+<div class="form-container">
+    <div class="row">
+        <div class="col-lg-8 col-md-10 mx-auto">
+            <div class="form-card card">
+                <div class="card-header">
+                    <h2 class="mb-0">{% if form.instance.pk %}Редактирование курса{% else %}Создание нового курса{% endif %}</h2>
+                </div>
+                <div class="card-body">
+                    <form method="post" enctype="multipart/form-data" id="course-form">
+                        {% csrf_token %}
+                        {{ form|crispy }}
+                        <div class="button-section">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-check-circle me-2"></i>Сохранить
+                            </button>
+                            <a href="{% if form.instance.pk %}{% url 'course_detail' form.instance.pk %}{% else %}{% url 'course_list' %}{% endif %}" class="btn btn-outline-secondary">
+                                <i class="bi bi-x-circle me-2"></i>Отмена
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Анимации появления элементов
+        const formGroups = document.querySelectorAll('.form-group');
+        formGroups.forEach((group, index) => {
+            group.style.opacity = '0';
+            group.style.transform = 'translateY(10px)';
+
+            setTimeout(() => {
+                group.style.transition = 'all 0.5s ease';
+                group.style.opacity = '1';
+                group.style.transform = 'translateY(0)';
+            }, 100 + (index * 70));
+        });
+
+        // Эффект нажатия кнопок
+        const buttons = document.querySelectorAll('.btn');
+        buttons.forEach(button => {
+            button.addEventListener('click', function(e) {
+                const rect = button.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+
+                const circle = document.createElement('span');
+                circle.style.position = 'absolute';
+                circle.style.width = '1px';
+                circle.style.height = '1px';
+                circle.style.borderRadius = '50%';
+                circle.style.backgroundColor = 'rgba(255, 255, 255, 0.5)';
+                circle.style.transform = 'scale(0)';
+                circle.style.left = x + 'px';
+                circle.style.top = y + 'px';
+                circle.style.animation = 'ripple 0.6s linear';
+
+                button.appendChild(circle);
+
+                setTimeout(() => {
+                    circle.remove();
+                }, 700);
+            });
+        });
+
+        // Улучшенный drag-and-drop для поля загрузки файлов
+        const fileInput = document.querySelector('input[type="file"]');
+        if (fileInput) {
+            const fileParent = fileInput.closest('.form-group');
+
+            if (fileParent) {
+                // Создаем зону перетаскивания
+                const dropZone = document.createElement('div');
+                dropZone.className = 'form-file mb-3';
+                dropZone.innerHTML = '<i class="bi bi-cloud-arrow-up fs-3 mb-2"></i><p class="mb-0">Перетащите изображение сюда или нажмите для выбора</p>';
+
+                // Добавляем скрытый файловый инпут
+                fileInput.style.display = 'none';
+                fileParent.querySelector('.controls').prepend(dropZone);
+                dropZone.appendChild(fileInput);
+
+                // Обработчики событий для drag & drop
+                dropZone.addEventListener('dragover', function(e) {
+                    e.preventDefault();
+                    dropZone.classList.add('dragging');
+                });
+
+                dropZone.addEventListener('dragleave', function() {
+                    dropZone.classList.remove('dragging');
+                });
+
+                dropZone.addEventListener('drop', function(e) {
+                    e.preventDefault();
+                    dropZone.classList.remove('dragging');
+
+                    if (e.dataTransfer.files.length) {
+                        fileInput.files = e.dataTransfer.files;
+                        updateFileName(e.dataTransfer.files[0].name);
+                    }
+                });
+
+                dropZone.addEventListener('click', function() {
+                    fileInput.click();
+                });
+
+                fileInput.addEventListener('change', function() {
+                    if (fileInput.files.length) {
+                        updateFileName(fileInput.files[0].name);
+                    }
+                });
+
+                // Обновляем отображение имени файла
+                function updateFileName(name) {
+                    const fileNameDisplay = dropZone.querySelector('p');
+                    fileNameDisplay.textContent = `Выбран файл: ${name}`;
+                    dropZone.style.borderColor = '#5a67d8';
+                    dropZone.style.backgroundColor = 'rgba(90, 103, 216, 0.05)';
+                }
+
+                // Если уже есть файл (при редактировании)
+                const currentFileDisplay = fileParent.querySelector('.clearablefileinput');
+                if (currentFileDisplay && currentFileDisplay.textContent.includes('Currently:')) {
+                    const fileName = currentFileDisplay.textContent.split('Currently: ')[1].split(' ')[0];
+                    updateFileName(fileName);
+                }
+            }
+        }
+
+        // Улучшение поля с эдитором, если есть
+        const textareas = document.querySelectorAll('textarea');
+        textareas.forEach(textarea => {
+            textarea.addEventListener('focus', function() {
+                this.style.height = '150px';
+            });
+
+            textarea.addEventListener('blur', function() {
+                if (!this.value.trim()) {
+                    this.style.height = '120px';
+                }
+            });
+        });
+
+        // Анимация для отправки формы
+        const courseForm = document.getElementById('course-form');
+        courseForm.addEventListener('submit', function() {
+            const submitBtn = this.querySelector('.btn-primary');
+            submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Сохранение...';
+            submitBtn.disabled = true;
+        });
+    });
+
+    // Добавление стиля для анимации кнопки
+    document.head.insertAdjacentHTML('beforeend', `
+        <style>
+            @keyframes ripple {
+                0% {
+                    transform: scale(0);
+                    opacity: 1;
+                }
+                100% {
+                    transform: scale(500);
+                    opacity: 0;
+                }
+            }
+
+            .spinner-border {
+                width: 1rem;
+                height: 1rem;
+                vertical-align: text-bottom;
+                border-width: 0.15em;
+            }
+        </style>
+    `);
+</script>
+{% endblock %}

@@ -1,0 +1,335 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block extra_css %}
+<style>
+    .submission-card {
+        border-radius: 12px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        overflow: hidden;
+        background: #fff;
+        margin-top: 30px;
+        margin-bottom: 30px;
+    }
+
+    .submission-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+    }
+
+    .card-header {
+        background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+        color: white;
+        padding: 20px;
+        border-bottom: none;
+    }
+
+    .card-header h2 {
+        margin: 0;
+        font-weight: 600;
+        animation: fadeIn 0.8s ease;
+    }
+
+    .card-body {
+        padding: 30px;
+    }
+
+    .assignment-title {
+        color: #333;
+        font-weight: 600;
+        margin-bottom: 15px;
+        position: relative;
+        padding-bottom: 10px;
+        animation: slideInRight 0.5s ease;
+    }
+
+    .assignment-title:after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 50px;
+        height: 3px;
+        background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+        animation: expandWidth 1s ease forwards;
+    }
+
+    .assignment-description {
+        color: #555;
+        margin-bottom: 25px;
+        animation: fadeIn 0.8s ease 0.2s both;
+    }
+
+    .submission-status {
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 25px;
+        animation: fadeIn 0.8s ease 0.4s both;
+        transition: all 0.3s ease;
+    }
+
+    .submission-status.pending {
+        background-color: rgba(255, 193, 7, 0.1);
+        border-left: 4px solid #ffc107;
+    }
+
+    .submission-status.approved {
+        background-color: rgba(40, 167, 69, 0.1);
+        border-left: 4px solid #28a745;
+    }
+
+    .submission-status.rejected {
+        background-color: rgba(220, 53, 69, 0.1);
+        border-left: 4px solid #dc3545;
+    }
+
+    .submission-status p {
+        margin-bottom: 10px;
+    }
+
+    .submission-status p:last-child {
+        margin-bottom: 0;
+    }
+
+    .submission-status strong {
+        color: #444;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+        animation: slideInUp 0.5s ease 0.6s both;
+    }
+
+    .form-control {
+        border-radius: 6px;
+        border: 1px solid #ddd;
+        padding: 12px;
+        transition: all 0.3s ease;
+    }
+
+    .form-control:focus {
+        border-color: #6a11cb;
+        box-shadow: 0 0 0 0.2rem rgba(106, 17, 203, 0.25);
+    }
+
+    .btn {
+        border-radius: 6px;
+        padding: 10px 20px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+        border: none;
+    }
+
+    .btn-primary:hover {
+        background: linear-gradient(135deg, #5a0cb2 0%, #1665e5 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(42, 118, 252, 0.3);
+    }
+
+    .btn-outline-secondary {
+        color: #555;
+        border: 1px solid #ccc;
+    }
+
+    .btn-outline-secondary:hover {
+        background-color: #f8f9fa;
+        color: #333;
+    }
+
+    .buttons-container {
+        display: flex;
+        gap: 15px;
+        animation: slideInUp 0.5s ease 0.8s both;
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+        }
+        to {
+            opacity: 1;
+        }
+    }
+
+    @keyframes slideInRight {
+        from {
+            transform: translateX(-20px);
+            opacity: 0;
+        }
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
+
+    @keyframes slideInUp {
+        from {
+            transform: translateY(20px);
+            opacity: 0;
+        }
+        to {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    }
+
+    @keyframes expandWidth {
+        from {
+            width: 0;
+        }
+        to {
+            width: 50px;
+        }
+    }
+
+    /* Для адаптивности на мобильных устройствах */
+    @media (max-width: 768px) {
+        .submission-card {
+            margin-top: 15px;
+            margin-bottom: 15px;
+        }
+
+        .card-body {
+            padding: 20px;
+        }
+
+        .buttons-container {
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .btn {
+            width: 100%;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-10 mx-auto">
+        <div class="submission-card card">
+            <div class="card-header">
+                <h2 class="mb-0">Отправка решения</h2>
+            </div>
+            <div class="card-body">
+                <h4 class="assignment-title">{{ assignment.title }}</h4>
+                <div class="assignment-description mb-4">{{ assignment.description|safe }}</div>
+
+                {% if existing_submission %}
+                    <div class="submission-status {% if existing_submission.status == 'pending' %}pending{% elif existing_submission.status == 'approved' %}approved{% else %}rejected{% endif %}">
+                        <p><strong>Статус:</strong>
+                            {% if existing_submission.status == 'pending' %}
+                                <span class="status-text">На проверке</span>
+                            {% elif existing_submission.status == 'approved' %}
+                                <span class="status-text">Одобрено</span>
+                            {% else %}
+                                <span class="status-text">Отклонено</span>
+                            {% endif %}
+                        </p>
+                        {% if existing_submission.feedback %}
+                            <p><strong>Отзыв:</strong> {{ existing_submission.feedback }}</p>
+                        {% endif %}
+                        {% if existing_submission.score %}
+                            <p><strong>Оценка:</strong> <span class="score">{{ existing_submission.score }}</span> из {{ assignment.points }}</p>
+                        {% endif %}
+                    </div>
+                {% endif %}
+
+                <form method="post" enctype="multipart/form-data" class="submission-form">
+                    {% csrf_token %}
+                    {{ form|crispy }}
+                    <div class="buttons-container mt-4">
+                        <button type="submit" class="btn btn-primary">Отправить</button>
+                        <a href="{% url 'lesson_detail' lesson.id %}" class="btn btn-outline-secondary">Отмена</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{{ form.media }}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Анимация для формы при загрузке
+        const formElements = document.querySelectorAll('.form-group');
+        formElements.forEach((element, index) => {
+            element.style.opacity = '0';
+            element.style.transform = 'translateY(20px)';
+            setTimeout(() => {
+                element.style.transition = 'all 0.5s ease';
+                element.style.opacity = '1';
+                element.style.transform = 'translateY(0)';
+            }, 300 + index * 100);
+        });
+
+        // Анимация для статуса
+        const statusElement = document.querySelector('.submission-status');
+        if (statusElement) {
+            const statusText = statusElement.querySelector('.status-text');
+            if (statusText) {
+                statusText.style.opacity = '0';
+                setTimeout(() => {
+                    statusText.style.transition = 'opacity 0.5s ease';
+                    statusText.style.opacity = '1';
+                }, 500);
+            }
+
+            const scoreElement = statusElement.querySelector('.score');
+            if (scoreElement) {
+                const finalScore = parseInt(scoreElement.textContent);
+                scoreElement.textContent = '0';
+                let currentScore = 0;
+
+                const scoreInterval = setInterval(() => {
+                    currentScore += 1;
+                    scoreElement.textContent = currentScore;
+
+                    if (currentScore >= finalScore) {
+                        clearInterval(scoreInterval);
+                    }
+                }, 100);
+            }
+        }
+
+        // Анимация при отправке формы
+        const form = document.querySelector('.submission-form');
+        if (form) {
+            form.addEventListener('submit', function(e) {
+                const submitButton = this.querySelector('button[type="submit"]');
+                submitButton.classList.add('submitting');
+                submitButton.innerHTML = '<span class="spinner"></span> Отправка...';
+            });
+        }
+    });
+</script>
+<style>
+    .submitting {
+        position: relative;
+        pointer-events: none;
+    }
+
+    .spinner {
+        display: inline-block;
+        width: 15px;
+        height: 15px;
+        border: 2px solid rgba(255,255,255,0.3);
+        border-radius: 50%;
+        border-top-color: #fff;
+        animation: spin 1s ease-in-out infinite;
+        margin-right: 5px;
+    }
+
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+</style>
+{% endblock %}

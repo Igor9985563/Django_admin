@@ -1,0 +1,271 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h1>О нас</h1>
+    </div>
+</div>
+
+<div class="card mb-4">
+    <div class="card-header">
+        <h5 class="mb-0">Наша миссия</h5>
+    </div>
+    <div class="card-body">
+        <p>Наша образовательная платформа создана для того, чтобы сделать обучение доступным, эффективным и увлекательным. Мы стремимся помогать студентам достигать своих целей через качественное онлайн-образование.</p>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Наши преимущества</h5>
+            </div>
+            <div class="card-body">
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item">
+                        <i class="bi bi-check-circle-fill text-success me-2"></i>
+                        Качественные материалы от ведущих экспертов
+                    </li>
+                    <li class="list-group-item">
+                        <i class="bi bi-check-circle-fill text-success me-2"></i>
+                        Интерактивные задания и проекты
+                    </li>
+                    <li class="list-group-item">
+                        <i class="bi bi-check-circle-fill text-success me-2"></i>
+                        Индивидуальная обратная связь от преподавателей
+                    </li>
+                    <li class="list-group-item">
+                        <i class="bi bi-check-circle-fill text-success me-2"></i>
+                        Гибкий график обучения
+                    </li>
+                    <li class="list-group-item">
+                        <i class="bi bi-check-circle-fill text-success me-2"></i>
+                        Сообщество единомышленников
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0">Наша статистика</h5>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-6 mb-4">
+                        <h2 class="text-primary">{{ courses_count|default:"50+" }}</h2>
+                        <p>курсов</p>
+                    </div>
+                    <div class="col-6 mb-4">
+                        <h2 class="text-primary">{{ students_count|default:"10000+" }}</h2>
+                        <p>студентов</p>
+                    </div>
+                    <div class="col-6">
+                        <h2 class="text-primary">{{ teachers_count|default:"30+" }}</h2>
+                        <p>преподавателей</p>
+                    </div>
+                    <div class="col-6">
+                        <h2 class="text-primary">{{ satisfaction_rate|default:"95%" }}</h2>
+                        <p>довольных студентов</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card mb-4">
+    <div class="card-header">
+        <h5 class="mb-0">Наша команда</h5>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            {% for member in team_members|default:'' %}
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100">
+                        <div class="card-body text-center">
+                            <div class="mb-3">
+                                {% if member.photo %}
+                                    <img src="{{ member.photo.url }}" alt="{{ member.name }}" class="rounded-circle" width="120" height="120">
+                                {% else %}
+                                    <div class="bg-light rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 120px; height: 120px;">
+                                        <i class="bi bi-person-fill" style="font-size: 3rem;"></i>
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <h5 class="card-title">{{ member.name|default:"Иван Иванов" }}</h5>
+                            <p class="card-text text-muted">{{ member.position|default:"Директор по обучению" }}</p>
+                            <p class="card-text">{{ member.description|default:"Эксперт с многолетним опытом в области образования и технологий. Автор популярных курсов по программированию." }}</p>
+                        </div>
+                        <div class="card-footer bg-white">
+                            <div class="d-flex justify-content-center">
+                                <a href="#" class="mx-2 text-dark"><i class="bi bi-linkedin"></i></a>
+                                <a href="#" class="mx-2 text-dark"><i class="bi bi-envelope-fill"></i></a>
+                                <a href="#" class="mx-2 text-dark"><i class="bi bi-twitter"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% empty %}
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100">
+                        <div class="card-body text-center">
+                            <div class="mb-3">
+                                <div class="bg-light rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 120px; height: 120px;">
+                                    <i class="bi bi-person-fill" style="font-size: 3rem;"></i>
+                                </div>
+                            </div>
+                            <h5 class="card-title">Анна Петрова</h5>
+                            <p class="card-text text-muted">Генеральный директор</p>
+                            <p class="card-text">Опытный руководитель с более чем 10-летним стажем в образовательной сфере. Основатель нашей платформы.</p>
+                        </div>
+                        <div class="card-footer bg-white">
+                            <div class="d-flex justify-content-center">
+                                <a href="#" class="mx-2 text-dark"><i class="bi bi-linkedin"></i></a>
+                                <a href="#" class="mx-2 text-dark"><i class="bi bi-envelope-fill"></i></a>
+                                <a href="#" class="mx-2 text-dark"><i class="bi bi-twitter"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100">
+                        <div class="card-body text-center">
+                            <div class="mb-3">
+                                <div class="bg-light rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 120px; height: 120px;">
+                                    <i class="bi bi-person-fill" style="font-size: 3rem;"></i>
+                                </div>
+                            </div>
+                            <h5 class="card-title">Михаил Сидоров</h5>
+                            <p class="card-text text-muted">Технический директор</p>
+                            <p class="card-text">Отвечает за техническую инфраструктуру платформы. Эксперт в области веб-разработки и систем обучения.</p>
+                        </div>
+                        <div class="card-footer bg-white">
+                            <div class="d-flex justify-content-center">
+                                <a href="#" class="mx-2 text-dark"><i class="bi bi-linkedin"></i></a>
+                                <a href="#" class="mx-2 text-dark"><i class="bi bi-envelope-fill"></i></a>
+                                <a href="#" class="mx-2 text-dark"><i class="bi bi-twitter"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100">
+                        <div class="card-body text-center">
+                            <div class="mb-3">
+                                <div class="bg-light rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 120px; height: 120px;">
+                                    <i class="bi bi-person-fill" style="font-size: 3rem;"></i>
+                                </div>
+                            </div>
+                            <h5 class="card-title">Елена Иванова</h5>
+                            <p class="card-text text-muted">Директор по обучению</p>
+                            <p class="card-text">Разрабатывает образовательные программы и контролирует качество курсов. Имеет опыт в педагогике более 15 лет.</p>
+                        </div>
+                        <div class="card-footer bg-white">
+                            <div class="d-flex justify-content-center">
+                                <a href="#" class="mx-2 text-dark"><i class="bi bi-linkedin"></i></a>
+                                <a href="#" class="mx-2 text-dark"><i class="bi bi-envelope-fill"></i></a>
+                                <a href="#" class="mx-2 text-dark"><i class="bi bi-twitter"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<div class="card mb-4">
+    <div class="card-header">
+        <h5 class="mb-0">Наши партнеры</h5>
+    </div>
+    <div class="card-body">
+        <div class="row align-items-center justify-content-center">
+            {% for partner in partners|default:'' %}
+                <div class="col-md-3 col-6 text-center mb-4">
+                    {% if partner.logo %}
+                        <img src="{{ partner.logo.url }}" alt="{{ partner.name }}" class="img-fluid grayscale-hover" style="max-height: 80px;">
+                    {% else %}
+                        <div class="bg-light d-flex align-items-center justify-content-center p-3" style="height: 80px;">
+                            <span class="text-muted">{{ partner.name|default:"Партнер" }}</span>
+                        </div>
+                    {% endif %}
+                </div>
+            {% empty %}
+                <div class="col-md-3 col-6 text-center mb-4">
+                    <div class="bg-light d-flex align-items-center justify-content-center p-3" style="height: 80px;">
+                        <span class="text-muted">Компания А</span>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6 text-center mb-4">
+                    <div class="bg-light d-flex align-items-center justify-content-center p-3" style="height: 80px;">
+                        <span class="text-muted">Компания Б</span>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6 text-center mb-4">
+                    <div class="bg-light d-flex align-items-center justify-content-center p-3" style="height: 80px;">
+                        <span class="text-muted">Компания В</span>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6 text-center mb-4">
+                    <div class="bg-light d-flex align-items-center justify-content-center p-3" style="height: 80px;">
+                        <span class="text-muted">Компания Г</span>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<div class="card mb-4">
+    <div class="card-header bg-success text-white">
+        <h5 class="mb-0">Свяжитесь с нами</h5>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6">
+                <form method="post" action="{% url 'contact' %}">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Ваше имя</label>
+                        <input type="text" class="form-control" id="name" name="name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="email" name="email" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="subject" class="form-label">Тема</label>
+                        <input type="text" class="form-control" id="subject" name="subject" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="message" class="form-label">Сообщение</label>
+                        <textarea class="form-control" id="message" name="message" rows="4" required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Отправить сообщение</button>
+                </form>
+            </div>
+            <div class="col-md-6">
+                <h5>Контактная информация</h5>
+                <p><i class="bi bi-geo-alt-fill me-2 text-primary"></i> {{ contact_info.address|default:"ул. Образовательная, 42, г. Москва" }}</p>
+                <p><i class="bi bi-telephone-fill me-2 text-primary"></i> {{ contact_info.phone|default:"+7 (999) 123-45-67" }}</p>
+                <p><i class="bi bi-envelope-fill me-2 text-primary"></i> {{ contact_info.email|default:"info@образование.рф" }}</p>
+                <p><i class="bi bi-clock-fill me-2 text-primary"></i> {{ contact_info.hours|default:"Пн-Пт: 9:00 - 18:00" }}</p>
+
+                <h5 class="mt-4">Социальные сети</h5>
+                <div class="d-flex">
+                    <a href="#" class="btn btn-outline-primary me-2"><i class="bi bi-facebook"></i></a>
+                    <a href="#" class="btn btn-outline-info me-2"><i class="bi bi-twitter"></i></a>
+                    <a href="#" class="btn btn-outline-danger me-2"><i class="bi bi-instagram"></i></a>
+                    <a href="#" class="btn btn-outline-dark me-2"><i class="bi bi-telegram"></i></a>
+                    <a href="#" class="btn btn-outline-danger"><i class="bi bi-youtube"></i></a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

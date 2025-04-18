@@ -1,0 +1,216 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+<style>
+    .review-card {
+        border-radius: 12px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        transform: translateY(20px);
+        opacity: 0;
+        animation: fade-in-up 0.6s ease forwards;
+        overflow: hidden;
+        border: none;
+        transition: box-shadow 0.3s ease, transform 0.3s ease;
+    }
+
+    .review-card:hover {
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+        transform: translateY(-5px);
+    }
+
+    @keyframes fade-in-up {
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .card-header {
+        background: linear-gradient(135deg, #3f87a6, #5b507a);
+        color: white;
+        padding: 1.5rem;
+        border-bottom: none;
+    }
+
+    .card-body {
+        padding: 2rem;
+        background-color: #f8f9fa;
+    }
+
+    .form-control, .select2-selection {
+        border-radius: 8px;
+        padding: 12px;
+        border: 1px solid #e0e0e0;
+        box-shadow: none;
+        transition: all 0.3s ease;
+    }
+
+    .form-control:focus, .select2-selection:focus {
+        border-color: #5b507a;
+        box-shadow: 0 0 0 0.2rem rgba(91, 80, 122, 0.25);
+    }
+
+    .btn {
+        border-radius: 8px;
+        padding: 10px 24px;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        transition: all 0.3s ease;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #3f87a6, #5b507a);
+        border: none;
+        box-shadow: 0 4px 12px rgba(91, 80, 122, 0.3);
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 15px rgba(91, 80, 122, 0.4);
+        background: linear-gradient(135deg, #4295b6, #6b5c8a);
+    }
+
+    .btn-outline-secondary {
+        border: 2px solid #ced4da;
+        color: #6c757d;
+    }
+
+    .btn-outline-secondary:hover {
+        background-color: #f1f3f5;
+        color: #5b507a;
+        border-color: #5b507a;
+    }
+
+    .form-group label {
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        color: #495057;
+    }
+
+    /* Анимация для радио-кнопок и чекбоксов */
+    .form-check-input {
+        transition: all 0.2s ease;
+    }
+
+    .form-check-input:checked {
+        background-color: #5b507a;
+        border-color: #5b507a;
+        animation: pulse 0.4s ease;
+    }
+
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.2); }
+        100% { transform: scale(1); }
+    }
+
+    /* Анимация для кнопок */
+    .btn-action-group {
+        display: flex;
+        gap: 12px;
+    }
+
+    .btn-action-group .btn {
+        transform: scale(0.95);
+        opacity: 0;
+        animation: button-appear 0.4s ease forwards;
+    }
+
+    .btn-action-group .btn:nth-child(2) {
+        animation-delay: 0.1s;
+    }
+
+    @keyframes button-appear {
+        to {
+            transform: scale(1);
+            opacity: 1;
+        }
+    }
+
+    /* Анимация для заголовка */
+    .card-title {
+        position: relative;
+        display: inline-block;
+    }
+
+    .card-title:after {
+        content: '';
+        position: absolute;
+        width: 0;
+        height: 3px;
+        bottom: -5px;
+        left: 0;
+        background: rgba(255, 255, 255, 0.7);
+        transition: width 0.5s ease;
+    }
+
+    .card-header:hover .card-title:after {
+        width: 100%;
+    }
+
+    /* Анимация для текстовых полей */
+    .form-control:focus::placeholder {
+        transform: translateX(10px);
+        opacity: 0.5;
+        transition: all 0.3s ease;
+    }
+</style>
+
+<div class="container py-5">
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <div class="review-card card">
+                <div class="card-header">
+                    <h2 class="card-title mb-0">Отзыв о курсе "{{ course.title }}"</h2>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        {{ form|crispy }}
+                        <div class="mt-4 btn-action-group">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-2"></i>Сохранить отзыв
+                            </button>
+                            <a href="{% url 'course_detail' course.id %}" class="btn btn-outline-secondary">
+                                <i class="fas fa-times me-2"></i>Отмена
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Добавляем плавные переходы для элементов формы при их появлении
+    document.addEventListener('DOMContentLoaded', function() {
+        const formElements = document.querySelectorAll('.form-group');
+
+        formElements.forEach((element, index) => {
+            element.style.opacity = '0';
+            element.style.transform = 'translateY(20px)';
+            element.style.transition = 'all 0.3s ease';
+
+            setTimeout(() => {
+                element.style.opacity = '1';
+                element.style.transform = 'translateY(0)';
+            }, 100 + (index * 50));
+        });
+
+        // Улучшенная анимация для текстовых полей при фокусе
+        const inputFields = document.querySelectorAll('.form-control');
+
+        inputFields.forEach(input => {
+            input.addEventListener('focus', function() {
+                this.parentElement.classList.add('input-focused');
+            });
+
+            input.addEventListener('blur', function() {
+                this.parentElement.classList.remove('input-focused');
+            });
+        });
+    });
+</script>
+{% endblock %}

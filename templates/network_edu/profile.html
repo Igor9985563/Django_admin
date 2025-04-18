@@ -1,0 +1,237 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<style>
+    .profile-section {
+        padding: 2rem 0;
+    }
+
+    .profile-avatar {
+        position: relative;
+        width: 180px;
+        height: 180px;
+        margin: 0 auto 1.5rem;
+        border-radius: 50%;
+        overflow: hidden;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        border: 5px solid #fff;
+    }
+
+    .profile-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .profile-card {
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        border: none;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .profile-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+    }
+
+    .profile-info {
+        padding: 1.5rem;
+    }
+
+    .username {
+        font-weight: 700;
+        font-size: 1.75rem;
+        margin-bottom: 0.25rem;
+    }
+
+    .email {
+        color: #6c757d;
+        font-size: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .instructor-badge {
+        background: linear-gradient(45deg, #4776E6, #8E54E9);
+        border-radius: 30px;
+        padding: 0.5rem 1.25rem;
+        color: white;
+        font-weight: 600;
+        display: inline-block;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        letter-spacing: 1px;
+        box-shadow: 0 4px 15px rgba(142, 84, 233, 0.2);
+    }
+
+    .edit-btn {
+        background: linear-gradient(45deg, #4776E6, #8E54E9);
+        color: white;
+        border-radius: 30px;
+        padding: 0.5rem 1.5rem;
+        font-weight: 600;
+        border: none;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-block;
+        margin-top: 1rem;
+        box-shadow: 0 4px 15px rgba(142, 84, 233, 0.2);
+    }
+
+    .edit-btn:hover {
+        background: linear-gradient(45deg, #3A67D7, #7A3FDC);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 18px rgba(142, 84, 233, 0.3);
+        color: white;
+    }
+
+    .section-card {
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        border: none;
+        margin-bottom: 1.5rem;
+    }
+
+    .section-header {
+        background: linear-gradient(to right, #f8f9fa, #ffffff);
+        padding: 1.25rem 1.5rem;
+        border-bottom: 1px solid #f1f1f1;
+    }
+
+    .section-title {
+        margin: 0;
+        font-weight: 700;
+        font-size: 1.25rem;
+        color: #333;
+    }
+
+    .section-body {
+        padding: 1.5rem;
+    }
+
+    .course-item {
+        border-radius: 10px;
+        margin-bottom: 1rem;
+        transition: all 0.3s ease;
+        border-left: 4px solid #4776E6;
+    }
+
+    .course-item:hover {
+        background-color: #f8f9fa;
+        transform: translateX(5px);
+    }
+
+    .course-item:last-child {
+        margin-bottom: 0;
+    }
+
+    .course-title {
+        color: #333;
+        font-weight: 600;
+    }
+
+    .course-date {
+        color: #6c757d;
+        font-weight: 500;
+    }
+
+    .course-desc {
+        color: #6c757d;
+        font-size: 0.95rem;
+        margin-bottom: 0;
+    }
+
+    .empty-text {
+        color: #adb5bd;
+        font-style: italic;
+        text-align: center;
+        padding: 1.5rem 0;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container profile-section">
+    <div class="row">
+        <!-- Левая колонка с аватаром и основной информацией -->
+        <div class="col-md-4">
+            <div class="profile-card">
+                <div class="profile-info text-center">
+                    <div class="profile-avatar">
+                    {% if profile_user.profile.avatar %}
+                        <img src="{{ profile_user.profile.avatar.url }}" class="profile-img" alt="{{ profile_user.username }}">
+                    {% else %}
+                        <div class="bg-light text-center py-5 profile-placeholder">
+                            <i class="bi bi-person-circle display-1 text-secondary avatar-icon"></i>
+                            <p class="mt-2">{{ profile_user.username|first|upper }}</p>
+                        </div>
+                    {% endif %}
+
+                    </div>
+
+                    <h2 class="username">{{ profile_user.username }}</h2>
+                    <p class="email">{{ profile_user.email }}</p>
+
+                    {% if profile_user.profile.is_instructor %}
+                        <div class="instructor-badge mb-3">Инструктор</div>
+                    {% endif %}
+
+                    {% if user == profile_user %}
+                        <a href="{% url 'profile_edit' username=profile_user.username %}" class="edit-btn">
+                            <i class="fas fa-edit me-2"></i>Редактировать профиль
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Правая колонка с дополнительной информацией -->
+        <div class="col-md-8">
+            <!-- Блок "О пользователе" -->
+            <div class="section-card">
+                <div class="section-header">
+                    <h5 class="section-title">О пользователе</h5>
+                </div>
+                <div class="section-body">
+                    {% if profile_user.profile.bio %}
+                        <p>{{ profile_user.profile.bio }}</p>
+                    {% else %}
+                        <p class="empty-text">Информация о пользователе отсутствует.</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Блок "Курсы инструктора" (если пользователь - инструктор) -->
+            {% if profile_user.profile.is_instructor %}
+                <div class="section-card">
+                    <div class="section-header">
+                        <h5 class="section-title">Курсы инструктора</h5>
+                    </div>
+                    <div class="section-body">
+                        {% with courses=profile_user.courses.all %}
+                            {% if courses %}
+                                <div class="list-group">
+                                    {% for course in courses %}
+                                        <a href="{% url 'course_detail' course.id %}" class="list-group-item list-group-item-action course-item">
+                                            <div class="d-flex w-100 justify-content-between align-items-center">
+                                                <h5 class="mb-1 course-title">{{ course.title }}</h5>
+                                                <small class="course-date">{{ course.created_at|date:"d.m.Y" }}</small>
+                                            </div>
+                                            <p class="course-desc">{{ course.description|truncatechars:100 }}</p>
+                                        </a>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                <p class="empty-text">Пользователь не создал ни одного курса.</p>
+                            {% endif %}
+                        {% endwith %}
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

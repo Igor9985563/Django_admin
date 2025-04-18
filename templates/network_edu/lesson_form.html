@@ -1,0 +1,134 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/default.min.css">
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Header with title -->
+    <div class="bg-gradient-primary text-blue p-4 rounded-lg shadow mb-4">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h1 class="fw-bold">Добавление урока</h1>
+                <p class="lead mb-0">Создайте новый урок для модуля "{{ module.title }}"</p>
+            </div>
+            <div>
+                <a href="{% url 'course_detail' course.id %}" class="btn btn-light text-primary">
+                    <i class="bi bi-arrow-left me-2"></i>Вернуться к курсу
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Form Card -->
+    <div class="row">
+        <div class="col-lg-10 mx-auto">
+            <div class="card border-0 rounded-lg shadow">
+                <div class="card-header bg-white border-0 pt-4 px-4">
+                    <h2 class="h4 mb-0 fw-bold"><i class="bi bi-file-earmark-text me-2 text-primary"></i>Информация об уроке</h2>
+                </div>
+                <div class="card-body p-4">
+                    <form method="post" id="lessonForm">
+                        {% csrf_token %}
+
+                        <div class="form-sections">
+                            {{ form|crispy }}
+                        </div>
+
+                        <div class="d-flex justify-content-between mt-4">
+                            <a href="{% url 'course_detail' course.id %}" class="btn btn-outline-secondary rounded-pill px-4">
+                                <i class="bi bi-x-circle me-2"></i>Отмена
+                            </a>
+                            <button type="submit" class="btn btn-primary rounded-pill px-4">
+                                <i class="bi bi-check-circle me-2"></i>Сохранить
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{{ form.media }}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Add subtle animation to the form fields
+    const formGroups = document.querySelectorAll('.form-group');
+    formGroups.forEach((group, index) => {
+        group.style.opacity = '0';
+        group.style.transform = 'translateY(20px)';
+        group.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+
+        setTimeout(() => {
+            group.style.opacity = '1';
+            group.style.transform = 'translateY(0)';
+        }, 100 * (index + 1));
+    });
+
+    // Add subtle hover effect to the card
+    const card = document.querySelector('.card');
+    card.style.transition = 'transform 0.3s ease, box-shadow 0.3s ease';
+
+    card.addEventListener('mouseenter', function() {
+        this.style.transform = 'translateY(-5px)';
+        this.style.boxShadow = '0 15px 30px rgba(0,0,0,0.1)';
+    });
+
+    card.addEventListener('mouseleave', function() {
+        this.style.transform = 'translateY(0)';
+        this.style.boxShadow = '0 .5rem 1rem rgba(0,0,0,.15)';
+    });
+
+    // Add focus effect to form fields
+    const formControls = document.querySelectorAll('.form-control');
+    formControls.forEach(control => {
+        control.addEventListener('focus', function() {
+            this.closest('.form-group').style.borderLeft = '3px solid #0d6efd';
+            this.closest('.form-group').style.paddingLeft = '15px';
+            this.closest('.form-group').style.transition = 'all 0.3s ease';
+        });
+
+        control.addEventListener('blur', function() {
+            this.closest('.form-group').style.borderLeft = '0';
+            this.closest('.form-group').style.paddingLeft = '0';
+        });
+    });
+
+    // Add animation for rich text editors (if present)
+    const richTextAreas = document.querySelectorAll('.django-ckeditor-widget');
+    if (richTextAreas.length > 0) {
+        richTextAreas.forEach(area => {
+            area.style.transition = 'box-shadow 0.3s ease';
+
+            // Add special effect for rich text editors when in use
+            if (window.CKEDITOR) {
+                for (let instanceName in CKEDITOR.instances) {
+                    CKEDITOR.instances[instanceName].on('focus', function() {
+                        const editorElement = this.container.$;
+                        editorElement.style.boxShadow = '0 0 0 3px rgba(13, 110, 253, 0.25)';
+                    });
+
+                    CKEDITOR.instances[instanceName].on('blur', function() {
+                        const editorElement = this.container.$;
+                        editorElement.style.boxShadow = 'none';
+                    });
+                }
+            }
+        });
+    }
+
+    // Add submit animation
+    const form = document.getElementById('lessonForm');
+    form.addEventListener('submit', function() {
+        const submitBtn = this.querySelector('button[type="submit"]');
+        submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Сохранение...';
+        submitBtn.disabled = true;
+    });
+});
+</script>
+{% endblock %}
